@@ -57,15 +57,12 @@ def draw_large_grid(x, y):
     for j in range (x, LARGE_DIMENSION + x + 1, LARGE_SQUARE_SIZE): # horizontal
         pygame.draw.line(DISPLAY, BLACK, (y,j), (LARGE_DIMENSION + y, j))
         
-        
-    
-def main():
-    pygame.init()
-    pygame.display.set_caption('Pls work') 
-    
-    DISPLAY.fill(WHITE)
-    # draw the small grids
+     
+def draw_all_grids():
+    # possible coordinates for small grids (top-left corners)
     possible_coordinates = [PADDING, int((WINDOW_DIMENSION - SMALL_DIMENSION) / 2), WINDOW_DIMENSION - SMALL_DIMENSION - PADDING]
+    
+    # draw the small grids
     for i in range(3):
         for j in range(3):
             if i == 1 and j == 1:
@@ -73,12 +70,21 @@ def main():
             else:
                 print(possible_coordinates[i], possible_coordinates[j])
                 draw_small_grid(possible_coordinates[i], possible_coordinates[j])
-                
-    
+
+
     # draw the large grid
     start_x = start_y = (2 * PADDING) + SMALL_DIMENSION
     draw_large_grid(start_x, start_y)
-
+    
+    
+    
+def main():
+    pygame.init()
+    pygame.display.set_caption('Pls work') 
+    
+    DISPLAY.fill(WHITE)
+    
+    draw_all_grids()
     
     while True:
         for event in pygame.event.get():
