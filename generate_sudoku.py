@@ -11,7 +11,6 @@ def generate_ordered_2d_board():
         for j in range(3):
             board.append([((x+i) + 3*j) % 9 + 1 for x in range(9)])
             
-            
     return board
     
     
