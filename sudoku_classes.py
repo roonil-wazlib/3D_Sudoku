@@ -1,7 +1,70 @@
-class Sudoku3D:
+class Sudoku:
     
     def __init__(self, ls):
-        self.x_elements = ls # list representation in column form as viewed from x axis
+        self.board = ls
+        
+        if not self.is_correct():
+            #throw error
+            raise Exception("This is an invalid Sudoku board")
+        
+        else:
+            print("VALID")
+
+    
+    def is_correct(self):
+        """return True if current board violates Latin Square properties of Sudoku"""
+        
+        if self._x_correct() and self._y_correct() and self._sub_squares_correct():
+            return True
+        else:
+            return False
+        
+    
+    def _y_correct(self):
+        """check columns all valid latin square columns"""
+        
+        for i in range(len(self.board)):
+            items = set()
+            for element in self.board[i] :
+                if element in items and element != "":
+                    return False
+                else:
+                    items.add(element)
+                    
+        return True
+                
+                
+    def _x_correct(self):
+        """check rows all latin square rows"""
+        for i in range(len(self.board)):
+            items = set()
+            for column in self.board:
+                if column[i] in items and column[i] != "":
+                    return False
+                else:
+                    items.add(column[i])
+                    
+        return True
+                    
+    
+    def _sub_squares_correct(self):
+        """check if each subsquare is a valid sudoku subsquare"""
+        for i in range(int(len(self.board) / 3)):
+            items = set()
+            for j in range(int(len(self.board) / 3)):
+                if self.board[3*i][j] in items and self.board[3*i][j] != "":
+                    return False
+                else:
+                    items.add(self.board[3*i][j])
+                    
+        return True
+                
+        
+
+class Sudoku3D(Sudoku):
+    
+    def __init__(self, ls):
+        self.x_elements = [Sudoku(x) for x in ls] # list representation in column form as viewed from x axis
         self.y_elements = self.get_y_view()
         self.z_elements = self.get_z_view()
     
@@ -19,9 +82,10 @@ class Sudoku3D:
         
         y_view = []
         for i in range(len(self.x_elements)): # works for arbitrary sized sudoku
-            y_view.append([x[i] for x in self.x_elements])
+            y_view.append([x.board[i] for x in self.x_elements])
             
-        return y_view
+        y_view = [Sudoku(x) for x in y_view]
+        return Sudoku(y_view)
     
     
     def get_z_view(self):
@@ -34,8 +98,9 @@ class Sudoku3D:
         z_view = []
         
         for i in range(len(self.x_elements)): # works for arbitrary sized sudoku
-            z_view.append([[x[i] for x in y] for y in self.x_elements])
+            z_view.append([[x[i] for x in y] for y.board in self.x_elements])
             
+        z_view = [Sudoku(x) for x in z_view]
         return z_view
             
             

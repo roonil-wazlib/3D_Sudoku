@@ -1,5 +1,5 @@
 import random
-from sudoku_classes import Sudoku3D
+from sudoku_classes import *
 
 
 def generate_ordered_2d_board():
@@ -23,7 +23,11 @@ def generate_3d_board():
     return cube
     
     
-generate_ordered_2d_board()
-board = Sudoku3D(generate_3d_board())
-print(board.y_elements)
-print(board.z_elements)
+board = Sudoku(generate_ordered_2d_board())
+cube = Sudoku3D(generate_3d_board())
+print(cube.y_elements)
+print(cube.z_elements)
+board2 = generate_ordered_2d_board()
+board2[0][0] = 2
+board2 = Sudoku(board2)
+print(board2.is_correct())
