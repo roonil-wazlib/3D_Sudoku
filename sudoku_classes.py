@@ -5,6 +5,7 @@ class Sudoku:
         
         if not self.is_correct():
             #throw error
+            print(self.board)
             raise Exception("This is an invalid Sudoku board")
         
         else:

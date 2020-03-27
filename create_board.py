@@ -1,8 +1,11 @@
 import pygame, sys
 from pygame.locals import *
+from generate_sudoku import *
+
+pygame.init()
+
 
 # BUILD UP DIMENSIONS FROM SMALLEST UNIT TO PREVENT ROUNDING ERROR
-
 # small grid dimensions
 SMALL_CELL_SIZE = 20
 SMALL_SQUARE_SIZE = SMALL_CELL_SIZE * 3
@@ -17,16 +20,24 @@ LARGE_DIMENSION = LARGE_SQUARE_SIZE * 3
 PADDING = 25
 WINDOW_DIMENSION = LARGE_DIMENSION * 2 + (PADDING * 4)
 
-
+#game info
 FPSCLOCK = pygame.time.Clock()
 DISPLAY = pygame.display.set_mode((WINDOW_DIMENSION, WINDOW_DIMENSION))
+FPS = 10
 
+#colours
 BLACK = (0, 0, 0)
 WHITE = (255,255,255)
 GRAY = (200, 200, 200)
 
-FPS = 10
+#font info
+SMALL_FONT_SIZE = 15
+LARGE_FONT_SIZE = 30
+SMALL_FONT = pygame.font.Font('freesansbold.ttf', SMALL_FONT_SIZE)
+LARGE_FONT = pygame.font.Font('freesansbold.ttf', LARGE_FONT_SIZE)
 
+# possible coordinates for small grids (top-left corners)
+POSSIBLE_COORDINATES = [PADDING, int((WINDOW_DIMENSION - SMALL_DIMENSION) / 2), WINDOW_DIMENSION - SMALL_DIMENSION - PADDING]
 
 def draw_small_grid(x, y):
     """ draw a small grid starting at (x, y) coordinates """
@@ -59,32 +70,69 @@ def draw_large_grid(x, y):
         
      
 def draw_all_grids():
-    # possible coordinates for small grids (top-left corners)
-    possible_coordinates = [PADDING, int((WINDOW_DIMENSION - SMALL_DIMENSION) / 2), WINDOW_DIMENSION - SMALL_DIMENSION - PADDING]
-    
     # draw the small grids
     for i in range(3):
         for j in range(3):
             if i == 1 and j == 1:
                 pass
             else:
-                print(possible_coordinates[i], possible_coordinates[j])
-                draw_small_grid(possible_coordinates[i], possible_coordinates[j])
-
+                draw_small_grid(POSSIBLE_COORDINATES[i], POSSIBLE_COORDINATES[j])
 
     # draw the large grid
     start_x = start_y = (2 * PADDING) + SMALL_DIMENSION
     draw_large_grid(start_x, start_y)
     
     
+def populate_cells_small(board, x, y):
+    """ populate Sudoku board from starting x, y coordinates """
+    for i in range(9):
+        for j in range(9):
+            cell_surf = SMALL_FONT.render('%s' %(board[i][j]), True, BLACK)
+            cell_rect = cell_surf.get_rect()
+            cell_rect.topleft = (x + i * SMALL_CELL_SIZE + SMALL_CELL_SIZE - SMALL_FONT_SIZE, y + j * SMALL_CELL_SIZE + SMALL_CELL_SIZE - SMALL_FONT_SIZE)
+            DISPLAY.blit(cell_surf, cell_rect)
+    
+    
+def populate_cells_large(board, x, y):
+    """ populate in-focus Sudoku board from starting x, y coordinates """
+    
+    for i in range(9):
+        for j in range(9):
+            cell_surf = LARGE_FONT.render('%s' %(board[i][j]), True, BLACK)
+            cell_rect = cell_surf.get_rect()
+            cell_rect.topleft = (x + i * LARGE_CELL_SIZE + LARGE_CELL_SIZE - LARGE_FONT_SIZE, y + j * LARGE_CELL_SIZE + LARGE_CELL_SIZE - LARGE_FONT_SIZE)
+            DISPLAY.blit(cell_surf, cell_rect)
+            
+            
+
+def populate_all_cells(cube):
+    
+    """ populate cells of each sudoku board using slices of a cube """
+    
+    #populate small cells
+    for i in range(3):
+        for j in range(3):
+            if i == 1 and j == 1:
+                pass
+            else:
+                populate_cells_small(cube[3*i+j], POSSIBLE_COORDINATES[i], POSSIBLE_COORDINATES[j])            
+        
+    
+    #populate large cells
+    x = y = (2 * PADDING) + SMALL_DIMENSION
+    populate_cells_large(cube[4], x, y)    
+    
+    
     
 def main():
-    pygame.init()
     pygame.display.set_caption('Pls work') 
     
     DISPLAY.fill(WHITE)
     
     draw_all_grids()
+    cube = generate_3d_board()
+    
+    populate_all_cells(cube)
     
     while True:
         for event in pygame.event.get():
@@ -92,7 +140,10 @@ def main():
                 pygame.quit()
                 sys.exit()
         pygame.display.update()
-        FPSCLOCK.tick(FPS)   
+        FPSCLOCK.tick(FPS)
+        
+        
+    
         
         
 if __name__ == '__main__':
