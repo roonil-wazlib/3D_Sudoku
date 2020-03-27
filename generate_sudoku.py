@@ -1,4 +1,5 @@
 import random
+from sudoku_classes import Sudoku3D
 
 
 def generate_ordered_2d_board():
@@ -11,8 +12,19 @@ def generate_ordered_2d_board():
             board.append([((x+i) + 3*j) % 9 + 1 for x in range(9)])
             
             
-    for x in board:
-        print(x)
+    return board
+    
+    
+def generate_3d_board():
+    """place holder 3d generater to test Sudoku3D class"""
+    layer = generate_ordered_2d_board()
+    cube = []
+    for i in range(len(layer)):
+        cube.append(layer)
+    return cube
     
     
 generate_ordered_2d_board()
+board = Sudoku3D(generate_3d_board())
+print(board.y_elements)
+print(board.z_elements)

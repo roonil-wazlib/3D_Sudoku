@@ -36,7 +36,6 @@ class Sudoku3D:
         for i in range(len(self.x_elements)): # works for arbitrary sized sudoku
             z_view.append([[x[i] for x in y] for y in self.x_elements])
             
-            
         return z_view
             
             
