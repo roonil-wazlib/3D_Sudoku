@@ -7,13 +7,11 @@ class Sudoku:
             #throw error
             print(self.board)
             raise Exception("This is an invalid Sudoku board")
-        
-        else:
-            print("VALID")
+    
 
     
     def is_correct(self):
-        """return True if current board violates Latin Square properties of Sudoku"""
+        """return True if current board satisfies Latin Square and subsquare properties of Sudoku"""
         
         if self._x_correct() and self._y_correct() and self._sub_squares_correct():
             return True
@@ -50,14 +48,18 @@ class Sudoku:
     
     def _sub_squares_correct(self):
         """check if each subsquare is a valid sudoku subsquare"""
-        #currently broken
-        for i in range(int(len(self.board) / 3)):
-            items = set()
-            for j in range(int(len(self.board) / 3)):
-                if self.board[3*i][j] in items and self.board[3*i][j] != "":
-                    return False
-                else:
-                    items.add(self.board[3*i][j])
+        #loop x,y coordinates of subsquares
+        for x in range(int(len(self.board)/3)):
+            for y in range(int(len(self.board)/3)):
+                items = set()
+                
+                #loop j,k coordinates of elements in subsquare
+                for i in range(int(len(self.board) / 3)):
+                    for j in range(int(len(self.board) / 3)):
+                        if self.board[3*x + i][3*y + j] in items and self.board[3*x + i][3*y + j] != "":
+                            return False
+                        else:
+                            items.add(self.board[3*x + i][3*y + j])
                     
         return True
     

@@ -47,12 +47,4 @@ def generate_3d_board():
 #print(board2.is_correct())
 
 
-square = []
-for i in range(9):
-    col = []
-    for j in range(9):
-        col.append((i+j)%9 + 1)
-    square.append(col)
-    
-board = Sudoku(square)
-print(board)
+
