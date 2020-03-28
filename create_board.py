@@ -19,19 +19,25 @@ LARGE_DIMENSION = LARGE_SQUARE_SIZE * 3
 # window dimensions
 PADDING = 50
 BORDER = 30
-WINDOW_DIMENSION = LARGE_DIMENSION * 3 + 2*BORDER
+GAME_SECTION = LARGE_DIMENSION * 3 + 2*BORDER
+MENU_SECTION = 800
+WINDOW_X = GAME_SECTION + MENU_SECTION
+WINDOW_Y = GAME_SECTION
 
 #game info
 FPSCLOCK = pygame.time.Clock()
-DISPLAY = pygame.display.set_mode((WINDOW_DIMENSION, WINDOW_DIMENSION))
+DISPLAY = pygame.display.set_mode((WINDOW_X, WINDOW_Y))
+
 FPS = 10
 
-#colours
+#colours for text, background and grids
 BLACK = (0, 0, 0)
 WHITE = (255,255,255)
 GRAY = (200, 200, 200)
 BLUE = (0, 0, 255)
-YELLOW = (255, 255, 0, 70) #partially transparent
+
+#partially transparent for highlighting
+YELLOW = (255, 255, 0, 70) 
 TURQOISE = (0, 255, 255, 70)
 GREEN = (0, 255, 0, 70)
 PURPLE1 = (140,0,255,70)
@@ -44,7 +50,7 @@ SMALL_FONT = pygame.font.Font('freesansbold.ttf', SMALL_FONT_SIZE)
 LARGE_FONT = pygame.font.Font('freesansbold.ttf', LARGE_FONT_SIZE)
 
 # possible coordinates for small grids (top-left corners)
-POSSIBLE_COORDINATES_1D = [BORDER+PADDING, int((WINDOW_DIMENSION - SMALL_DIMENSION) / 2), WINDOW_DIMENSION - BORDER - SMALL_DIMENSION - PADDING]
+POSSIBLE_COORDINATES_1D = [BORDER + PADDING, int((GAME_SECTION - SMALL_DIMENSION) / 2), GAME_SECTION - BORDER - SMALL_DIMENSION - PADDING]
 
 #fix : these should not be constants
 coord_lookup = {}
@@ -52,6 +58,8 @@ board_number_lookup = {}
 
 
 def get_all_grid_coordinates(current_large):
+    """ populate dictionaries with coordinates of each grid and corresponding grid number """
+    
     for index, x in enumerate(POSSIBLE_COORDINATES_1D):
         for index2, y in enumerate(POSSIBLE_COORDINATES_1D):
             if index + 3*index2 == current_large - 1:
@@ -69,6 +77,7 @@ def get_all_grid_coordinates(current_large):
     
 def draw_small_grid(x, y):
     """ draw a small grid starting at (x, y) coordinates """
+    
     # draw little lines
     for i in range(x, SMALL_DIMENSION + x, SMALL_CELL_SIZE): # vertical
         pygame.draw.line(DISPLAY, GRAY, (i,y), (i, SMALL_DIMENSION + y))
@@ -84,6 +93,7 @@ def draw_small_grid(x, y):
     
 def draw_large_grid(x, y):    
     """ draw the main grid starting at (x, y) coordinates """
+    
     # draw little lines
     for i in range(x, LARGE_DIMENSION + x, LARGE_CELL_SIZE): # vertical
         pygame.draw.line(DISPLAY, GRAY, (i,y), (i, LARGE_DIMENSION + y))
@@ -112,6 +122,7 @@ def draw_all_grids(current_large):
     
 def populate_cells_small(board, x, y, board_number):
     """ populate Sudoku board from starting x, y coordinates """
+    
     for i in range(9):
         for j in range(9):
             cell_surf = SMALL_FONT.render('%s' %(board[i][j]), True, BLACK)
@@ -127,6 +138,7 @@ def populate_cells_small(board, x, y, board_number):
     
 def populate_cells_large(board, x, y, board_number):
     """ populate in-focus Sudoku board from starting x, y coordinates """
+    
     for i in range(9):
         for j in range(9):
             cell_surf = LARGE_FONT.render('%s' %(board[i][j]), True, BLACK)
@@ -141,7 +153,6 @@ def populate_cells_large(board, x, y, board_number):
             
 
 def populate_all_cells(cube, current_large):
-    
     """ populate cells of each sudoku board using slices of a cube """
     
     (a,b) = coord_lookup[current_large]
@@ -172,8 +183,6 @@ def draw_large_box(x, y, current_large):
     
 def highlight_large_cell(cell_x, cell_y, COLOUR):
     """highlight the cell the passed in colour"""
-    
-    #pygame.draw.rect(DISPLAY, YELLOW, (cell_x + 1, cell_y + 1, LARGE_CELL_SIZE - 2, LARGE_CELL_SIZE - 2), 0)
     
     surf = pygame.Surface((LARGE_CELL_SIZE - 2, LARGE_CELL_SIZE - 2), pygame.SRCALPHA)
     surf.fill(COLOUR)
@@ -279,15 +288,11 @@ def update_display(cube, current_large, mouse_x=None, mouse_y=None):
     
     
 def main():
-    current_large = 2
+    #start with center board in focus
+    current_large = 5
     
+    pygame.display.set_caption('3D Sudoku')
     get_all_grid_coordinates(current_large)
-    
-    pygame.display.set_caption('3D Sudoku') 
-    
-    mouse_x = 0
-    mouse_y = 0
-    
     cube = Sudoku3D(generate_3d_board())
     update_display(cube, current_large)
     
