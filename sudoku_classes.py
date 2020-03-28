@@ -50,6 +50,7 @@ class Sudoku:
     
     def _sub_squares_correct(self):
         """check if each subsquare is a valid sudoku subsquare"""
+        #currently broken
         for i in range(int(len(self.board) / 3)):
             items = set()
             for j in range(int(len(self.board) / 3)):
