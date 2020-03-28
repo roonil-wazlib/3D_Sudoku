@@ -17,7 +17,7 @@ LARGE_SQUARE_SIZE = LARGE_CELL_SIZE * 3
 LARGE_DIMENSION = LARGE_SQUARE_SIZE * 3
 
 # window dimensions
-PADDING = 25
+PADDING = 50
 WINDOW_DIMENSION = LARGE_DIMENSION * 2 + (PADDING * 4)
 
 #game info
@@ -97,7 +97,7 @@ def draw_all_grids():
     draw_large_grid(LARGE_COORD, LARGE_COORD)
     
     
-def populate_cells_small(board, x, y):
+def populate_cells_small(board, x, y, board_number):
     """ populate Sudoku board from starting x, y coordinates """
     for i in range(9):
         for j in range(9):
@@ -105,9 +105,14 @@ def populate_cells_small(board, x, y):
             cell_rect = cell_surf.get_rect()
             cell_rect.topleft = (x + i * SMALL_CELL_SIZE + SMALL_CELL_SIZE - SMALL_FONT_SIZE + 1, y + j * SMALL_CELL_SIZE + SMALL_CELL_SIZE - SMALL_FONT_SIZE)
             DISPLAY.blit(cell_surf, cell_rect)
+            
+    label_surf = LARGE_FONT.render('%s' %(board_number), True, BLACK)
+    label_rect = label_surf.get_rect()
+    label_rect.topleft = (x + 4 * SMALL_CELL_SIZE + 2, y + SMALL_DIMENSION + SMALL_CELL_SIZE - 10)
+    DISPLAY.blit(label_surf, label_rect)            
     
     
-def populate_cells_large(board, x, y):
+def populate_cells_large(board, x, y, board_number):
     """ populate in-focus Sudoku board from starting x, y coordinates """
     for i in range(9):
         for j in range(9):
@@ -115,10 +120,14 @@ def populate_cells_large(board, x, y):
             cell_rect = cell_surf.get_rect()
             cell_rect.topleft = (x + i * LARGE_CELL_SIZE + LARGE_CELL_SIZE - LARGE_FONT_SIZE + 2, y + j * LARGE_CELL_SIZE + LARGE_CELL_SIZE - LARGE_FONT_SIZE - 2)
             DISPLAY.blit(cell_surf, cell_rect)
+    label_surf = LARGE_FONT.render('%s' %(board_number), True, BLACK)
+    label_rect = label_surf.get_rect()
+    label_rect.topleft = (x + 4 * LARGE_CELL_SIZE + LARGE_CELL_SIZE - LARGE_FONT_SIZE + 2, y + LARGE_DIMENSION + LARGE_CELL_SIZE - LARGE_FONT_SIZE + 2)
+    DISPLAY.blit(label_surf, label_rect)
             
             
 
-def populate_all_cells(cube):
+def populate_all_cells(cube, current_large):
     
     """ populate cells of each sudoku board using slices of a cube """
     
@@ -128,11 +137,11 @@ def populate_all_cells(cube):
             if i == 1 and j == 1:
                 pass
             else:
-                populate_cells_small(cube[3*i+j], POSSIBLE_COORDINATES_1D[i], POSSIBLE_COORDINATES_1D[j])
+                populate_cells_small(cube[3*i+j], POSSIBLE_COORDINATES_1D[j], POSSIBLE_COORDINATES_1D[i], 3*i + j + 1)
         
 
     #populate large cells
-    populate_cells_large(cube[4], LARGE_COORD, LARGE_COORD)
+    populate_cells_large(cube[4], LARGE_COORD, LARGE_COORD, current_large)
     
     
 def draw_large_box(x, y):
@@ -167,7 +176,7 @@ def draw_small_box(x, y):
     pygame.draw.rect(DISPLAY, BLUE, (x, y, SMALL_DIMENSION, SMALL_DIMENSION), 2)
     
     
-def highlight_relevant_cells(x, y, current_large):
+def highlight_relevant_cells(x, y, current_large, current_boards):
     """highlight the cells of elements 'related' to hovered over element"""
     
     cell_x = LARGE_COORD + ((x - LARGE_COORD) // LARGE_CELL_SIZE) * LARGE_CELL_SIZE
@@ -196,16 +205,16 @@ def highlight_relevant_cells(x, y, current_large):
                 
                 
     #highlighting the cells in the smaller boards
-    for x, y in POSSIBLE_SMALL_COORDS:
+    for (x, y) in POSSIBLE_SMALL_COORDS:
         for i in range(9):
             for j in range(9):
                 if (i, j) == (cell_x_index, cell_y_index):
                     #same column looking 'through' the cube
                     highlight_small_cell(x + i * SMALL_CELL_SIZE, y + j * SMALL_CELL_SIZE, YELLOW)
-                elif (i // 3 == cell_x_subsquare and j == cell_y_index):
+                elif (i // 3 == cell_x_subsquare and j == cell_y_index and (current_boards[(y,x)] - 1) // 3 == (current_large - 1) // 3):
                     #same subsquare looking down on the cube
                     highlight_small_cell(x + i * SMALL_CELL_SIZE, y + j * SMALL_CELL_SIZE, PURPLE1)
-                elif (j // 3 == cell_y_subsquare and i == cell_x_index):
+                elif (j // 3 == cell_y_subsquare and i == cell_x_index and (current_boards[(y,x)] - 1)// 3 == (current_large - 1) // 3):
                     #same subsquare looking at the cube from the side
                     highlight_small_cell(x + i * SMALL_CELL_SIZE, y + j * SMALL_CELL_SIZE, PURPLE2)
           
@@ -229,15 +238,15 @@ def in_small_box(x, y):
     return False, None
     
     
-def update_display(cube, current_large, mouse_x=None, mouse_y=None):
+def update_display(cube, current_large, current_boards, mouse_x=None, mouse_y=None):
     """ redraw display """
     DISPLAY.fill(WHITE)
     draw_all_grids()
-    populate_all_cells(cube.x_elements)
+    populate_all_cells(cube.x_elements, current_large)
     
     if mouse_x is not None and mouse_y is not None:
         if in_large_box(mouse_x, mouse_y):
-            highlight_relevant_cells(mouse_x, mouse_y, current_large)
+            highlight_relevant_cells(mouse_x, mouse_y, current_large, current_boards)
             draw_large_box(mouse_x, mouse_y)
         in_small, coords = in_small_box(mouse_x, mouse_y)
         if in_small:
@@ -247,14 +256,23 @@ def update_display(cube, current_large, mouse_x=None, mouse_y=None):
 def main():
     get_all_grid_coordinates()
     
-    pygame.display.set_caption('Pls work') 
+    current_large = 5
+    current_boards = {}
+    for index, coords in enumerate(POSSIBLE_SMALL_COORDS):
+        if index < 4:
+            current_boards[coords] = index + 1
+        else:
+            current_boards[coords] = index + 2
+            
+    current_boards[5] = (LARGE_COORD, LARGE_COORD)
+    
+    pygame.display.set_caption('3D Sudoku') 
     
     mouse_x = 0
     mouse_y = 0
     
     cube = Sudoku3D(generate_3d_board())
-    current_large = 4
-    update_display(cube, current_large)
+    update_display(cube, current_large, current_boards)
     
     
     while True: #main game loop
@@ -273,7 +291,7 @@ def main():
     
         
         # redraw everything
-        update_display(cube, current_large, mouse_x, mouse_y)    
+        update_display(cube, current_large, current_boards, mouse_x, mouse_y)    
     
         pygame.display.update()    
         FPSCLOCK.tick(FPS)        
