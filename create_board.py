@@ -33,6 +33,8 @@ BLUE = (0, 0, 255)
 YELLOW = (255, 255, 0, 70) #partially transparent
 TURQOISE = (0, 255, 255, 70)
 GREEN = (0, 255, 0, 70)
+PURPLE1 = (140,0,255,70)
+PURPLE2 = (255,0,140,70)
 
 #font info
 SMALL_FONT_SIZE = 15
@@ -151,6 +153,13 @@ def highlight_large_cell(cell_x, cell_y, COLOUR):
     DISPLAY.blit(surf, (cell_x + 1, cell_y + 1))
     
     
+def highlight_small_cell(cell_x, cell_y, COLOUR):
+    """highlight the cell the passed in colour"""
+    surf = pygame.Surface((SMALL_CELL_SIZE - 2, SMALL_CELL_SIZE - 2), pygame.SRCALPHA)
+    surf.fill(COLOUR)
+    DISPLAY.blit(surf, (cell_x + 1, cell_y + 1))    
+    
+    
 def draw_small_box(x, y):
     """ draw blue box around small grid"""
     cell_x = LARGE_COORD + ((x - LARGE_COORD) // LARGE_CELL_SIZE) * LARGE_CELL_SIZE
@@ -167,6 +176,10 @@ def highlight_relevant_cells(x, y, current_large):
     cell_x_subsquare = ((cell_x - LARGE_COORD) / LARGE_CELL_SIZE) // 3
     cell_y_subsquare = ((cell_y - LARGE_COORD) / LARGE_CELL_SIZE) // 3
     
+    cell_x_index = (cell_x - LARGE_COORD) // LARGE_CELL_SIZE
+    cell_y_index = (cell_y - LARGE_COORD) // LARGE_CELL_SIZE
+    
+    #highlighting the cells in the large Sudoku board
     for i in range(LARGE_COORD, LARGE_COORD + LARGE_DIMENSION , LARGE_CELL_SIZE):
         for j in range(LARGE_COORD, LARGE_COORD + LARGE_DIMENSION , LARGE_CELL_SIZE):
             
@@ -174,12 +187,27 @@ def highlight_relevant_cells(x, y, current_large):
                 if i == cell_x and j == cell_y:
                     pass
                 elif i == cell_x or j == cell_y:
-                    highlight_large_cell(i, j, TURQOISE)
-                else:
                     highlight_large_cell(i, j, GREEN)
+                else:
+                    highlight_large_cell(i, j, TURQOISE)
                     
             elif i == cell_x or j == cell_y:
                 highlight_large_cell(i, j, YELLOW)
+                
+                
+    #highlighting the cells in the smaller boards
+    for x, y in POSSIBLE_SMALL_COORDS:
+        for i in range(9):
+            for j in range(9):
+                if (i, j) == (cell_x_index, cell_y_index):
+                    #same column looking 'through' the cube
+                    highlight_small_cell(x + i * SMALL_CELL_SIZE, y + j * SMALL_CELL_SIZE, YELLOW)
+                elif (i // 3 == cell_x_subsquare and j == cell_y_index):
+                    #same subsquare looking down on the cube
+                    highlight_small_cell(x + i * SMALL_CELL_SIZE, y + j * SMALL_CELL_SIZE, PURPLE1)
+                elif (j // 3 == cell_y_subsquare and i == cell_x_index):
+                    #same subsquare looking at the cube from the side
+                    highlight_small_cell(x + i * SMALL_CELL_SIZE, y + j * SMALL_CELL_SIZE, PURPLE2)
           
                 
 
