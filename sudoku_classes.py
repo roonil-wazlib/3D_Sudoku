@@ -4,7 +4,6 @@ class Sudoku:
         self.board = ls
         
         if not self.is_correct():
-            #throw error
             raise Exception("This is an invalid Sudoku board")
     
 
@@ -19,7 +18,7 @@ class Sudoku:
         
     
     def _y_correct(self):
-        """check columns all valid latin square columns"""
+        """check columns are of valid latin square"""
         
         for i in range(len(self.board)):
             items = set()
@@ -33,7 +32,7 @@ class Sudoku:
                 
                 
     def _x_correct(self):
-        """check rows all latin square rows"""
+        """check rows are of valid latin square"""
         for i in range(len(self.board)):
             items = set()
             for column in self.board:

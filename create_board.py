@@ -24,26 +24,26 @@ MENU_SECTION = 800
 WINDOW_X = GAME_SECTION + MENU_SECTION
 WINDOW_Y = GAME_SECTION
 
-#game info
+# game info
 FPSCLOCK = pygame.time.Clock()
 DISPLAY = pygame.display.set_mode((WINDOW_X, WINDOW_Y))
 
 FPS = 10
 
-#colours for text, background and grids
+# colours for text, background and grids
 BLACK = (0, 0, 0)
 WHITE = (255,255,255)
 GRAY = (200, 200, 200)
 BLUE = (0, 0, 255)
 
-#partially transparent for highlighting
+# partially transparent for highlighting
 YELLOW = (255, 255, 0, 70) 
 TURQOISE = (0, 255, 255, 70)
 GREEN = (0, 255, 0, 70)
 PURPLE1 = (140,0,255,70)
 PURPLE2 = (255,0,140,70)
 
-#font info
+# font info
 SMALL_FONT_SIZE = 15
 LARGE_FONT_SIZE = 30
 SMALL_FONT = pygame.font.Font('freesansbold.ttf', SMALL_FONT_SIZE)
@@ -52,7 +52,7 @@ LARGE_FONT = pygame.font.Font('freesansbold.ttf', LARGE_FONT_SIZE)
 # possible coordinates for small grids (top-left corners)
 POSSIBLE_COORDINATES_1D = [BORDER + PADDING, int((GAME_SECTION - SMALL_DIMENSION) / 2), GAME_SECTION - BORDER - SMALL_DIMENSION - PADDING]
 
-#fix : these should not be constants
+# sudoku lookup dictionaries
 coord_lookup = {}
 board_number_lookup = {}
 
@@ -143,7 +143,7 @@ def populate_cells_large(board, x, y, board_number):
         for j in range(9):
             cell_surf = LARGE_FONT.render('%s' %(board[i][j]), True, BLACK)
             cell_rect = cell_surf.get_rect()
-            cell_rect.topleft = (x + i * LARGE_CELL_SIZE + LARGE_CELL_SIZE - LARGE_FONT_SIZE + 2, y + j * LARGE_CELL_SIZE + LARGE_CELL_SIZE - LARGE_FONT_SIZE - 2)
+            cell_rect.topleft = (x + i * LARGE_CELL_SIZE + LARGE_CELL_SIZE - LARGE_FONT_SIZE + 4, y + j * LARGE_CELL_SIZE + LARGE_CELL_SIZE - LARGE_FONT_SIZE)
             DISPLAY.blit(cell_surf, cell_rect)
     label_surf = LARGE_FONT.render('%s' %(board_number), True, BLACK)
     label_rect = label_surf.get_rect()
