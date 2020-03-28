@@ -36,6 +36,7 @@ BLACK = (0, 0, 0)
 WHITE = (255,255,255)
 GRAY = (200, 200, 200)
 BLUE = (0, 0, 255)
+ORANGE = (255, 180, 0)
 
 # partially transparent for highlighting
 YELLOW = (255, 255, 0, 70) 
@@ -273,11 +274,36 @@ def in_small_box(x, y, current_large):
     return False, None
     
     
-def update_display(cube, current_large, mouse_x=None, mouse_y=None):
+def select_box(x, y, current_large):
+    """highlight the selected box"""
+    (a,b) = coord_lookup[current_large]
+    
+    cell_x = a + ((x - a) // LARGE_CELL_SIZE) * LARGE_CELL_SIZE
+    cell_y = b + ((y - b) // LARGE_CELL_SIZE) * LARGE_CELL_SIZE
+    pygame.draw.rect(DISPLAY, ORANGE, (cell_x, cell_y, LARGE_CELL_SIZE, LARGE_CELL_SIZE), 2)
+    
+    
+def get_selected_coordinates(x, y, current_large):
+    """get coordinates from x perspective of selected box"""
+    (a,b) = coord_lookup[current_large]
+    
+    x = ((x - a) // LARGE_CELL_SIZE)
+    y = ((y - b) // LARGE_CELL_SIZE)
+    
+    return x, y
+    
+    
+def update_display(cube, current_large, current_dim, selected=None, mouse_x=None, mouse_y=None):
     """ redraw display """
     DISPLAY.fill(WHITE)
     draw_all_grids(current_large)
-    populate_all_cells(cube.x_elements, current_large)
+    if current_dim == "x":
+        cube_ls = cube.x_elements
+    elif current_dim == "y":
+        cube_ls = cube.y_elements
+    else:
+        cube_ls = cube.z_elements
+    populate_all_cells(cube_ls, current_large)
     draw_menu()
     
     if mouse_x is not None and mouse_y is not None:
@@ -287,6 +313,9 @@ def update_display(cube, current_large, mouse_x=None, mouse_y=None):
         in_small, coords = in_small_box(mouse_x, mouse_y, current_large)
         if in_small:
             draw_small_box(*coords, current_large)
+            
+    if selected is not None:
+        select_box(*selected, current_large)
             
     
     
@@ -316,6 +345,7 @@ def draw_menu():
 def main():
     #start with center board in focus
     current_large = 5
+    current_dim = "x"
     
     pygame.display.set_caption('3D Sudoku')
     get_all_grid_coordinates(current_large)
@@ -325,11 +355,14 @@ def main():
     game_cube = convert_to_game(solved_cube_ls)
     solved_cube = Sudoku3D(solution)
     cube = Sudoku3D(game_cube)
-    update_display(cube, current_large)
     
+    update_display(cube, current_large, current_dim)
+    
+    selected = None
     
     while True: #main game loop
         has_clicked = False
+        val = ""
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
@@ -341,12 +374,68 @@ def main():
             elif event.type == MOUSEBUTTONUP:
                 mouse_x, mouse_y = event.pos
                 has_clicked = True
+                
+            elif event.type == pygame.KEYDOWN:
+                
+                if event.key == pygame.K_1:
+                    val = 1
+                elif event.key == pygame.K_2:
+                    val = 2
+                elif event.key == pygame.K_3:
+                    val = 3
+                elif event.key == pygame.K_4:
+                    val = 4
+                elif event.key == pygame.K_5:
+                    val = 5
+                elif event.key == pygame.K_6:
+                    val = 6
+                elif event.key == pygame.K_7:
+                    val = 7
+                elif event.key == pygame.K_8:
+                    val = 8
+                elif event.key == pygame.K_9:
+                    val = 9
+                elif event.key == pygame.K_0:
+                    val = 0
+                elif event.key == pygame.K_x:
+                    #flip to x view
+                    current_dim = "x"
+                    
+                elif event.key == pygame.K_y:
+                    #flip to y view
+                    current_dim = "y"
+                    
+                elif event.key == pygame.K_z:
+                    #flip to z view
+                    current_dim = "z"
+                    
+                if selected is not None:
+                    #get coordinates of selected
+                    x, y = get_selected_coordinates(*selected, current_large)
+                    z = current_large - 1
+                    if current_dim == "x":
+                        game_cube[z][x][y] = val
+                        cube = Sudoku3D(game_cube)
+                        
+                    elif current_dim == "y":
+                        game_cube[x][z][y] = val
+                        cube = Sudoku3D(game_cube)
+                        
+                    else:
+                        game_cube[x][y][z] = val
+                        cube = Sudoku3D(game_cube)                   
     
         if has_clicked:
             in_small, coords = in_small_box(mouse_x, mouse_y, current_large)
+            selected = None
+            
             if in_small:
                 #change current_large
                 current_large = board_number_lookup[coords]
+                
+            elif in_large_box(mouse_x, mouse_y, current_large):
+                #set current selection to something
+                selected = (mouse_x, mouse_y)
                 
             elif mouse_x >= GAME_SECTION + 100 and mouse_x <= GAME_SECTION + MENU_SECTION - 100 and mouse_y >= 120 and mouse_y <= 160:
                 #generate new game
@@ -363,7 +452,7 @@ def main():
             
         # redraw everything
         get_all_grid_coordinates(current_large)
-        update_display(cube, current_large, mouse_x, mouse_y)    
+        update_display(cube, current_large, current_dim, selected, mouse_x, mouse_y)    
     
         pygame.display.update()    
         FPSCLOCK.tick(FPS)        
