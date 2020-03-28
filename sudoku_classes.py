@@ -4,6 +4,8 @@ class Sudoku:
         self.board = ls
         
         if not self.is_correct():
+            for x in self.board:
+                print(x)
             raise Exception("This is an invalid Sudoku board")
     
 

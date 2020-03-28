@@ -1,4 +1,5 @@
 import pygame, sys
+import copy
 from pygame.locals import *
 from generate_sudoku import *
 
@@ -20,7 +21,7 @@ LARGE_DIMENSION = LARGE_SQUARE_SIZE * 3
 PADDING = 50
 BORDER = 30
 GAME_SECTION = LARGE_DIMENSION * 3 + 2*BORDER
-MENU_SECTION = 800
+MENU_SECTION = 600
 WINDOW_X = GAME_SECTION + MENU_SECTION
 WINDOW_Y = GAME_SECTION
 
@@ -277,6 +278,7 @@ def update_display(cube, current_large, mouse_x=None, mouse_y=None):
     DISPLAY.fill(WHITE)
     draw_all_grids(current_large)
     populate_all_cells(cube.x_elements, current_large)
+    draw_menu()
     
     if mouse_x is not None and mouse_y is not None:
         if in_large_box(mouse_x, mouse_y, current_large):
@@ -285,6 +287,30 @@ def update_display(cube, current_large, mouse_x=None, mouse_y=None):
         in_small, coords = in_small_box(mouse_x, mouse_y, current_large)
         if in_small:
             draw_small_box(*coords, current_large)
+            
+    
+    
+def draw_menu():
+    """ draw menu """
+    # draw menu box
+    #pygame.draw.rect(DISPLAY, BLACK, (GAME_SECTION + 10, 10, MENU_SECTION - 20, WINDOW_Y - 30), 5)
+    
+    # draw generate button
+    pygame.draw.rect(DISPLAY, BLACK, (GAME_SECTION + 100, 120, MENU_SECTION - 200, 40), 2)
+    generate_surf = LARGE_FONT.render("NEW GAME", True, BLACK)
+    generate_rect = generate_surf.get_rect()
+    generate_rect.topleft = (GAME_SECTION + 220, 128)
+    DISPLAY.blit(generate_surf, generate_rect)
+    
+    
+    # draw solve button
+    pygame.draw.rect(DISPLAY, BLACK, (GAME_SECTION + 100, 180, MENU_SECTION - 200, 40), 2)
+    generate_surf = LARGE_FONT.render("SOLVE", True, BLACK)
+    generate_rect = generate_surf.get_rect()
+    generate_rect.topleft = (GAME_SECTION + 260, 188)
+    DISPLAY.blit(generate_surf, generate_rect)    
+    
+    
     
     
 def main():
@@ -293,7 +319,12 @@ def main():
     
     pygame.display.set_caption('3D Sudoku')
     get_all_grid_coordinates(current_large)
-    cube = Sudoku3D(generate_3d_board())
+    
+    solved_cube_ls = generate_3d_board()
+    solution = copy.deepcopy(solved_cube_ls)
+    game_cube = convert_to_game(solved_cube_ls)
+    solved_cube = Sudoku3D(solution)
+    cube = Sudoku3D(game_cube)
     update_display(cube, current_large)
     
     
@@ -316,12 +347,19 @@ def main():
             if in_small:
                 #change current_large
                 current_large = board_number_lookup[coords]
-                print(current_large)
                 
-            else:
-                #if square is editable, open edit
-                pass
-            
+            elif mouse_x >= GAME_SECTION + 100 and mouse_x <= GAME_SECTION + MENU_SECTION - 100 and mouse_y >= 120 and mouse_y <= 160:
+                #generate new game
+                solved_cube_ls = generate_3d_board()
+                solution = copy.deepcopy(solved_cube_ls)
+                game_cube = convert_to_game(solved_cube_ls)
+                solved_cube = Sudoku3D(solution)
+                cube = Sudoku3D(game_cube)
+                
+            elif mouse_x >= GAME_SECTION + 100 and mouse_x <= GAME_SECTION + MENU_SECTION - 100 and mouse_y >= 180 and mouse_y <= 220:
+                #solve game
+                #when rotations are working you will need to check you display the right one here
+                cube = solved_cube
             
         # redraw everything
         get_all_grid_coordinates(current_large)

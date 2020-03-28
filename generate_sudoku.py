@@ -17,7 +17,11 @@ def generate_shuffled_2d_board():
     """ Generate a 'random' 2D Sudoku board """
     
     ordered = generate_ordered_2d_board()
-    return shuffle_columns(ordered)
+    columns_shuffled = shuffle_columns(ordered)
+    # rows_shuffled = shuffle_rows(columns_shuffled)
+    relabeled = relabel_values(columns_shuffled)
+
+    return relabeled
     
     
     
@@ -42,9 +46,25 @@ def shuffle_rows(board):
     
     #convert rows to columns:
     board = rows_to_columns(board)
-    
+
     #now shuffle as columns
     return shuffle_columns(board)
+    
+    
+def relabel_values(board):
+    """makes the board look more random but actually just produces the same board (isomorphic by relabelling)"""
+    values = [1,2,3,4,5,6,7,8,9]
+    random.shuffle(values)
+    
+    output = []
+    
+    for x in board:
+        col = []
+        for y in x:
+            col.append(values[y-1])
+        output.append(col)
+        
+    return output
     
     
 def rows_to_columns(board):
@@ -58,6 +78,20 @@ def rows_to_columns(board):
         output.append(col)
         
     return output
+    
+    
+def shuffle_cube(cube):
+    shuffled = []
+    column_group_order = [0,1,2]
+    random.shuffle(column_group_order)
+    for i in column_group_order:
+        #shuffle columns within each of the 3 column groups
+        column_order = [0,1,2]
+        random.shuffle([0,1,2])
+        for j in column_order:
+            shuffled.append(cube[3*i + j])
+
+    return shuffled    
     
     
 def generate_3d_board():
@@ -78,7 +112,20 @@ def generate_3d_board():
             new_layer.append(new_column)
         cube.append(new_layer)
         
-    return cube
+    return shuffle_cube(cube)
+
+
+def convert_to_game(cube):
+    """ convert a valid Sudoku cube to a solvable game """
+    game_cube = cube[:]
+    for i in range(500):
+        #at least the remaining 379 elements will still be there
+        x = random.randrange(0,9,1)
+        y = random.randrange(0,9,1)
+        z = random.randrange(0,9,1)
+        game_cube[x][y][z] = ""
+        
+    return game_cube
     
     
 #board = Sudoku(generate_ordered_2d_board())
