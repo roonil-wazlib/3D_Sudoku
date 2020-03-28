@@ -11,7 +11,6 @@ def generate_ordered_2d_board():
         for j in range(3):
             board.append([((x+i) + 3*j) % 9 + 1 for x in range(9)])
             
-    print(board)
     return board
     
     
@@ -20,12 +19,19 @@ def generate_3d_board():
     layer = generate_ordered_2d_board()
     cube = []
     for i in range(len(layer)):
-        cube.append(layer)
+        new_layer = []
+        for j in range(len(layer)):
+            new_layer.append(layer[(i + j)%len(layer)])
+        cube.append(new_layer)
+    for layer in cube:
+        for x in layer:
+            print(x)
+        print("\n \n \n")
     return cube
     
     
 #board = Sudoku(generate_ordered_2d_board())
-#cube = Sudoku3D(generate_3d_board())
+cube = Sudoku3D(generate_3d_board())
 #print(cube.y_elements)
 #print(cube.z_elements)
 #board2 = generate_ordered_2d_board()

@@ -87,7 +87,7 @@ def populate_cells_small(board, x, y):
     """ populate Sudoku board from starting x, y coordinates """
     for i in range(9):
         for j in range(9):
-            cell_surf = SMALL_FONT.render('%s' %(board[i][j]), True, BLACK)
+            cell_surf = SMALL_FONT.render('%s' %(board[j][i]), True, BLACK)
             cell_rect = cell_surf.get_rect()
             cell_rect.topleft = (x + i * SMALL_CELL_SIZE + SMALL_CELL_SIZE - SMALL_FONT_SIZE, y + j * SMALL_CELL_SIZE + SMALL_CELL_SIZE - SMALL_FONT_SIZE)
             DISPLAY.blit(cell_surf, cell_rect)
@@ -95,10 +95,10 @@ def populate_cells_small(board, x, y):
     
 def populate_cells_large(board, x, y):
     """ populate in-focus Sudoku board from starting x, y coordinates """
-    
+    print(board)
     for i in range(9):
         for j in range(9):
-            cell_surf = LARGE_FONT.render('%s' %(board[i][j]), True, BLACK)
+            cell_surf = LARGE_FONT.render('%s' %(board[j][i]), True, BLACK)
             cell_rect = cell_surf.get_rect()
             cell_rect.topleft = (x + i * LARGE_CELL_SIZE + LARGE_CELL_SIZE - LARGE_FONT_SIZE, y + j * LARGE_CELL_SIZE + LARGE_CELL_SIZE - LARGE_FONT_SIZE)
             DISPLAY.blit(cell_surf, cell_rect)
@@ -130,9 +130,9 @@ def main():
     DISPLAY.fill(WHITE)
     
     draw_all_grids()
-    cube = generate_3d_board()
+    cube = Sudoku3D(generate_3d_board())
     
-    populate_all_cells(cube)
+    populate_all_cells(cube.x_elements)
     
     while True:
         for event in pygame.event.get():

@@ -59,6 +59,20 @@ class Sudoku:
                     items.add(self.board[3*i][j])
                     
         return True
+    
+    
+    def __len__(self):
+        return len(self.board)
+        
+    def __getitem__(self, index):
+        return self.board[index]
+    
+    def __repr__(self):
+        output = ""
+        for item in self.board:
+            output += " ".join([str(x) for x in item])
+            output += "\n"
+        return output
                 
         
 
@@ -86,7 +100,7 @@ class Sudoku3D(Sudoku):
             y_view.append([x.board[i] for x in self.x_elements])
             
         y_view = [Sudoku(x) for x in y_view]
-        return Sudoku(y_view)
+        return y_view
     
     
     def get_z_view(self):
@@ -99,7 +113,7 @@ class Sudoku3D(Sudoku):
         z_view = []
         
         for i in range(len(self.x_elements)): # works for arbitrary sized sudoku
-            z_view.append([[x[i] for x in y] for y.board in self.x_elements])
+            z_view.append([[x[i] for x in y.board] for y in self.x_elements])
             
         z_view = [Sudoku(x) for x in z_view]
         return z_view
