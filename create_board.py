@@ -29,6 +29,7 @@ FPS = 10
 BLACK = (0, 0, 0)
 WHITE = (255,255,255)
 GRAY = (200, 200, 200)
+BLUE = (0, 0, 255)
 
 #font info
 SMALL_FONT_SIZE = 15
@@ -37,8 +38,19 @@ SMALL_FONT = pygame.font.Font('freesansbold.ttf', SMALL_FONT_SIZE)
 LARGE_FONT = pygame.font.Font('freesansbold.ttf', LARGE_FONT_SIZE)
 
 # possible coordinates for small grids (top-left corners)
-POSSIBLE_COORDINATES = [PADDING, int((WINDOW_DIMENSION - SMALL_DIMENSION) / 2), WINDOW_DIMENSION - SMALL_DIMENSION - PADDING]
+POSSIBLE_COORDINATES_1D = [PADDING, int((WINDOW_DIMENSION - SMALL_DIMENSION) / 2), WINDOW_DIMENSION - SMALL_DIMENSION - PADDING]
+POSSIBLE_SMALL_COORDS = []
+LARGE_COORD = (2 * PADDING) + SMALL_DIMENSION
 
+def get_all_grid_coordinates():
+    for index, x in enumerate(POSSIBLE_COORDINATES_1D):
+        for index2, y in enumerate(POSSIBLE_COORDINATES_1D):
+            if index == 1 and index2 == 1:
+                pass
+            else:
+                POSSIBLE_SMALL_COORDS.append((x,y))
+    
+    
 def draw_small_grid(x, y):
     """ draw a small grid starting at (x, y) coordinates """
     # draw little lines
@@ -73,16 +85,10 @@ def draw_all_grids():
     """ draw all small and large grid lines """
     
     # draw the small grids
-    for i in range(3):
-        for j in range(3):
-            if i == 1 and j == 1:
-                pass
-            else:
-                draw_small_grid(POSSIBLE_COORDINATES[i], POSSIBLE_COORDINATES[j])
+    for (x,y) in POSSIBLE_SMALL_COORDS:
+        draw_small_grid(x, y)
 
-    # draw the large grid
-    start_x = start_y = (2 * PADDING) + SMALL_DIMENSION
-    draw_large_grid(start_x, start_y)
+    draw_large_grid(LARGE_COORD, LARGE_COORD)
     
     
 def populate_cells_small(board, x, y):
@@ -97,7 +103,6 @@ def populate_cells_small(board, x, y):
     
 def populate_cells_large(board, x, y):
     """ populate in-focus Sudoku board from starting x, y coordinates """
-    print(board)
     for i in range(9):
         for j in range(9):
             cell_surf = LARGE_FONT.render('%s' %(board[i][j]), True, BLACK)
@@ -117,34 +122,88 @@ def populate_all_cells(cube):
             if i == 1 and j == 1:
                 pass
             else:
-                populate_cells_small(cube[3*i+j], POSSIBLE_COORDINATES[i], POSSIBLE_COORDINATES[j])            
+                populate_cells_small(cube[3*i+j], POSSIBLE_COORDINATES_1D[i], POSSIBLE_COORDINATES_1D[j])
         
     
     #populate large cells
-    x = y = (2 * PADDING) + SMALL_DIMENSION
-    populate_cells_large(cube[4], x, y)    
+    populate_cells_large(cube[4], LARGE_COORD, LARGE_COORD)
     
+    
+def draw_large_box(x, y):
+    """ draw box around cell that is hovered over """
+    cell_x = LARGE_COORD + ((x - LARGE_COORD) // LARGE_CELL_SIZE) * LARGE_CELL_SIZE
+    cell_y = LARGE_COORD + ((y - LARGE_COORD) // LARGE_CELL_SIZE) * LARGE_CELL_SIZE
+    pygame.draw.rect(DISPLAY, BLUE, (cell_x, cell_y, LARGE_CELL_SIZE, LARGE_CELL_SIZE), 2)
+    
+    
+def draw_small_box(x, y):
+    """ draw box around small grid"""
+    
+    pygame.draw.rect(DISPLAY, BLUE, (x, y, SMALL_DIMENSION, SMALL_DIMENSION), 2)
+
+
+def in_large_box(x, y):    
+    """ check if mouse hovering over large Sudoku """
+    if x >= LARGE_COORD and x <= LARGE_COORD + LARGE_DIMENSION:
+        if y >= LARGE_COORD and y <= LARGE_COORD + LARGE_DIMENSION:
+            return True
+        
+    return False
+
+
+def in_small_box(x, y):
+    """ check if mouse is over small Sudoku """
+    for (a, b) in POSSIBLE_SMALL_COORDS:
+        if a <= x <= a + SMALL_DIMENSION and b <= y <= b + SMALL_DIMENSION:
+            return True, (a,b)
+        
+    return False, None
+    
+def update_display(cube, mouse_x=None, mouse_y=None):
+    """ redraw display """
+    DISPLAY.fill(WHITE)
+    draw_all_grids()
+    populate_all_cells(cube.x_elements)
+    
+    if mouse_x is not None and mouse_y is not None:
+        if in_large_box(mouse_x, mouse_y):
+            draw_large_box(mouse_x, mouse_y)
+        in_small, coords = in_small_box(mouse_x, mouse_y)
+        if in_small:
+            draw_small_box(*coords)
     
     
 def main():
+    get_all_grid_coordinates()
+    
     pygame.display.set_caption('Pls work') 
     
-    DISPLAY.fill(WHITE)
+    mouse_x = 0
+    mouse_y = 0
     
-    draw_all_grids()
     cube = Sudoku3D(generate_3d_board())
+    update_display(cube)
     
-    populate_all_cells(cube.z_elements)
-    
-    while True:
+    while True: #main game loop
+        has_clicked = False
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
-        pygame.display.update()
-        FPSCLOCK.tick(FPS)
+
+            elif event.type == MOUSEMOTION:
+                mouse_x, mouse_y = event.pos
+    
+            elif event.type == MOUSEBUTTONUP:
+                mouse_x, mouse_y = event.pos
+                has_clicked = True
+    
         
-        
+        # redraw everything
+        update_display(cube, mouse_x, mouse_y)    
+    
+        pygame.display.update()    
+        FPSCLOCK.tick(FPS)        
     
         
         
