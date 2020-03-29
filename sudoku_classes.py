@@ -2,7 +2,6 @@ class Sudoku:
     
     def __init__(self, ls, solution=True):
         self.board = ls
-        
         if solution:
             if not self.is_correct():
                 for x in self.board:
@@ -64,8 +63,7 @@ class Sudoku:
                         if self.board[3*x + i][3*y + j] in items and self.board[3*x + i][3*y + j] != "":
                             return False
                         else:
-                            items.add(self.board[3*x + i][3*y + j])
-                    
+                            items.add(self.board[3*x + i][3*y + j])       
         return True
     
     
@@ -82,6 +80,7 @@ class Sudoku:
             output += "\n"
         return output
                 
+        
         
 
 class Sudoku3D(Sudoku):
@@ -101,7 +100,6 @@ class Sudoku3D(Sudoku):
         
         #self.y_elements = self.get_y_view()
         self.z_elements = self.get_z_view()
-        
         
         
     def check(self, solution):
@@ -124,7 +122,6 @@ class Sudoku3D(Sudoku):
         """
         'rotate' Sudoku cube to get view from y perspective
         """
-        
         # nth list of all 2nd tier lists in x_view forms columns of nth 'layer' in y_view
         
         y_view = []
