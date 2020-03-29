@@ -55,6 +55,9 @@ LARGE_FONT = pygame.font.Font('freesansbold.ttf', LARGE_FONT_SIZE)
 # possible coordinates for small grids (top-left corners)
 POSSIBLE_COORDINATES_1D = [BORDER + PADDING, int((GAME_SECTION - SMALL_DIMENSION) / 2), GAME_SECTION - BORDER - SMALL_DIMENSION - PADDING]
 
+
+CUBE_SIDE_LENGTH = 300
+
 # sudoku lookup dictionaries
 coord_lookup = {}
 board_number_lookup = {}
@@ -80,7 +83,7 @@ def get_all_grid_coordinates(current_large):
     
 def draw_small_grid(x, y):
     """ draw a small grid starting at (x, y) coordinates """
-    
+
     # draw little lines
     for i in range(x, SMALL_DIMENSION + x, SMALL_CELL_SIZE): # vertical
         pygame.draw.line(DISPLAY, GRAY, (i,y), (i, SMALL_DIMENSION + y))
@@ -316,7 +319,7 @@ def get_selected_coordinates(x, y, current_large):
     return x, y
     
     
-def update_display(cube, current_large, current_dim, incorrect, selected=None, mouse_x=None, mouse_y=None):
+def update_display(cube, current_large, current_dim, incorrect, vertices, selected=None, mouse_x=None, mouse_y=None):
     """ redraw display """
     DISPLAY.fill(WHITE)
     draw_all_grids(current_large)
@@ -327,7 +330,7 @@ def update_display(cube, current_large, current_dim, incorrect, selected=None, m
     else:
         cube_ls = cube.z_elements
     populate_all_cells(cube_ls, current_large)
-    draw_menu()
+    draw_menu(vertices)
     
     if mouse_x is not None and mouse_y is not None:
         if in_large_box(mouse_x, mouse_y, current_large):
@@ -382,11 +385,13 @@ def mark_incorrect(current_dim, incorrect, current_large):
             highlight_small_cell(x, y, RED)
             
     
-def draw_menu():
+def draw_menu(vertices):
     """ draw menu """
     draw_new_game(BLACK)
     draw_solve(BLACK)
     draw_check(BLACK)
+    
+    draw_3D_cube(vertices)
     
     
 def draw_new_game(COLOUR):
@@ -414,7 +419,49 @@ def draw_check(COLOUR):
     check_surf = LARGE_FONT.render("CHECK", True, BLACK)
     check_rect = check_surf.get_rect()
     check_rect.topleft = (GAME_SECTION + 255, 248)
-    DISPLAY.blit(check_surf, check_rect)    
+    DISPLAY.blit(check_surf, check_rect)
+    
+
+def get_cube_vertices():
+    """generate list of cube vertices"""
+    midpoint = MENU_SECTION / 2 + GAME_SECTION
+    start = 340
+
+    vertex1 = (midpoint, start + 2 * CUBE_SIDE_LENGTH)
+    vertex2 = (midpoint + int(3**0.5 * CUBE_SIDE_LENGTH / 2), start + 1.5 * CUBE_SIDE_LENGTH)
+    vertex3 = (midpoint + int(3**0.5 * CUBE_SIDE_LENGTH / 2), start + 0.5 * CUBE_SIDE_LENGTH)
+    vertex4 = (midpoint, start)
+    vertex5 = (midpoint - int(3**0.5 * CUBE_SIDE_LENGTH / 2), start + 0.5 * CUBE_SIDE_LENGTH)
+    vertex6 = (midpoint - int(3**0.5 * CUBE_SIDE_LENGTH / 2), start + 1.5 * CUBE_SIDE_LENGTH)
+    vertex7 = (midpoint, start + CUBE_SIDE_LENGTH)
+    vertices = [vertex1, vertex2, vertex3, vertex4, vertex5, vertex6, vertex7]
+    
+    return vertices
+    
+    
+def draw_3D_cube(vertices):
+    """draw a 3D cube image"""
+    draw_x_view_parallelogram(vertices)
+    draw_y_view_parallelogram(vertices)
+    draw_z_view_parallelogram(vertices)
+    
+    
+def draw_x_view_parallelogram(vertices, border_colour=BLACK, fill_colour=WHITE):
+    """draw the x_view face of the cube"""
+    pygame.draw.polygon(DISPLAY, fill_colour, (vertices[0], vertices[1], vertices[2], vertices[6]))
+    pygame.draw.polygon(DISPLAY, border_colour, (vertices[0], vertices[1], vertices[2], vertices[6]), 5)
+    
+    
+def draw_y_view_parallelogram(vertices, border_colour=BLACK, fill_colour=WHITE):
+    """draw the y_view face of the cube"""
+    pygame.draw.polygon(DISPLAY, fill_colour, (vertices[6], vertices[2], vertices[3], vertices[4]))
+    pygame.draw.polygon(DISPLAY, border_colour, (vertices[6], vertices[2], vertices[3], vertices[4]), 5)
+    
+    
+def draw_z_view_parallelogram(vertices, border_colour=BLACK, fill_colour=WHITE):
+    """draw the z_view face of the cube"""
+    pygame.draw.polygon(DISPLAY, fill_colour, (vertices[0], vertices[6], vertices[4], vertices[5]))
+    pygame.draw.polygon(DISPLAY, border_colour, (vertices[0], vertices[6], vertices[4], vertices[5]), 5)
     
     
 def get_value(key, val=""):
@@ -451,6 +498,7 @@ def main():
     
     pygame.display.set_caption('3D Sudoku')
     get_all_grid_coordinates(current_large)
+    vertices = get_cube_vertices()
     
     solved_cube_ls = generate_3d_board()
     solution = copy.deepcopy(solved_cube_ls)
@@ -458,7 +506,7 @@ def main():
     solved_cube = Sudoku3D(solution)
     cube = Sudoku3D(game_cube, False)
     
-    update_display(cube, current_large, current_dim, incorrect)
+    update_display(cube, current_large, current_dim, incorrect, vertices)
     
     selected = None
     
@@ -539,7 +587,7 @@ def main():
             
         # redraw everything
         get_all_grid_coordinates(current_large)
-        update_display(cube, current_large, current_dim, incorrect, selected, mouse_x, mouse_y)    
+        update_display(cube, current_large, current_dim, incorrect, vertices, selected, mouse_x, mouse_y)    
     
         pygame.display.update()    
         FPSCLOCK.tick(FPS)        
