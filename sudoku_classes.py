@@ -1,13 +1,18 @@
 class Sudoku:
     
-    def __init__(self, ls):
+    def __init__(self, ls, solution=True):
         self.board = ls
         
-        if not self.is_correct():
-            for x in self.board:
-                print(x)
-            raise Exception("This is an invalid Sudoku board")
+        if solution:
+            if not self.is_correct():
+                for x in self.board:
+                    print(x)
+                raise Exception("This is an invalid Sudoku board")
     
+    
+    def insert_value(self, val, x, y):
+        """Insert value at coordinates (x), (y)"""
+        self.board[x][y] = val
 
     
     def is_correct(self):
@@ -81,10 +86,18 @@ class Sudoku:
 
 class Sudoku3D(Sudoku):
     
-    def __init__(self, ls):
-        self.x_elements = [Sudoku(x) for x in ls] # list representation in column form as viewed from x axis
+    def __init__(self, ls, solution=True):
+        self.solution = solution
+        self.x_elements = [Sudoku(x, self.solution) for x in ls] # list representation in column form as viewed from x axis
         self.y_elements = self.get_y_view()
         self.z_elements = self.get_z_view()
+    
+    
+    def insert_value(self, val, x, y, z):
+        """insert value at coordinates x, y, z"""
+        self.x_elements[z].insert_value(val, x, y)
+        self.y_elements[x].insert_value(val, z, y)
+        self.z_elements[x].insert_value(val, y, z)
     
         
     def get_x_view(self):
@@ -102,7 +115,7 @@ class Sudoku3D(Sudoku):
         for i in range(len(self.x_elements)): # works for arbitrary sized sudoku
             y_view.append([x.board[i] for x in self.x_elements])
             
-        y_view = [Sudoku(x) for x in y_view]
+        y_view = [Sudoku(x, self.solution) for x in y_view]
         return y_view
     
     
@@ -118,7 +131,7 @@ class Sudoku3D(Sudoku):
         for i in range(len(self.x_elements)): # works for arbitrary sized sudoku
             z_view.append([[x[i] for x in y.board] for y in self.x_elements])
             
-        z_view = [Sudoku(x) for x in z_view]
+        z_view = [Sudoku(x, self.solution) for x in z_view]
         return z_view
             
             

@@ -379,7 +379,7 @@ def main():
     solution = copy.deepcopy(solved_cube_ls)
     game_cube = convert_to_game(solved_cube_ls)
     solved_cube = Sudoku3D(solution)
-    cube = Sudoku3D(game_cube)
+    cube = Sudoku3D(game_cube, False)
     
     update_display(cube, current_large, current_dim)
     
@@ -424,16 +424,13 @@ def main():
                         
                         #update value of that square
                         if current_dim == "x":
-                            game_cube[z][x][y] = val
-                            cube = Sudoku3D(game_cube)
+                            cube.insert_value(val, x, y, z)
                             
                         elif current_dim == "y":
-                            game_cube[x][z][y] = val
-                            cube = Sudoku3D(game_cube)
+                            cube.insert_value(val, z, y, x)
                             
                         else:
-                            game_cube[x][y][z] = val
-                            cube = Sudoku3D(game_cube)
+                            cube.insert_value(val, z, x, y)
     
         if has_clicked:
             in_small, coords = in_small_box(mouse_x, mouse_y, current_large)
@@ -453,7 +450,7 @@ def main():
                 solution = copy.deepcopy(solved_cube_ls)
                 game_cube = convert_to_game(solved_cube_ls)
                 solved_cube = Sudoku3D(solution)
-                cube = Sudoku3D(game_cube)
+                cube = Sudoku3D(game_cube, False)
                 
             elif mouse_x >= GAME_SECTION + 100 and mouse_x <= GAME_SECTION + MENU_SECTION - 100 and mouse_y >= 180 and mouse_y <= 220:
                 #solve game
