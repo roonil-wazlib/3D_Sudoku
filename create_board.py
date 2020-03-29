@@ -542,7 +542,6 @@ def draw_z_view_parallelogram(vertices, border_colour=BLACK, fill_colour=WHITE):
     pygame.draw.polygon(DISPLAY, border_colour, (vertices[6], vertices[2], vertices[3], vertices[4]), 5)
     
     
-    
 def get_value(key, val=""):
     """ get value of number key typed """
     if key == pygame.K_1:
@@ -680,7 +679,6 @@ def main():
         pygame.display.update()    
         FPSCLOCK.tick(FPS)        
     
-        
         
 if __name__ == '__main__':
     main()
