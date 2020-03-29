@@ -129,16 +129,6 @@ def convert_to_game(cube):
             game_cube[x][y][z] = ""
         
     return game_cube
-    
-    
-#board = Sudoku(generate_ordered_2d_board())
-#cube = Sudoku3D(generate_3d_board())
-#print(cube.y_elements)
-#print(cube.z_elements)
-#board2 = generate_ordered_2d_board()
-#board2[0][0] = 2
-#board2 = Sudoku(board2)
-#print(board2.is_correct())
 
 
 
