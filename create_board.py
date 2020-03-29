@@ -35,6 +35,7 @@ FPS = 10
 BLACK = (0, 0, 0)
 WHITE = (255,255,255)
 GRAY = (200, 200, 200)
+DARKGRAY = (110,110,110)
 BLUE = (0, 0, 255)
 ORANGE = (255, 180, 0)
 
@@ -56,7 +57,7 @@ LARGE_FONT = pygame.font.Font('freesansbold.ttf', LARGE_FONT_SIZE)
 POSSIBLE_COORDINATES_1D = [BORDER + PADDING, int((GAME_SECTION - SMALL_DIMENSION) / 2), GAME_SECTION - BORDER - SMALL_DIMENSION - PADDING]
 
 
-CUBE_SIDE_LENGTH = 300
+CUBE_SIDE_LENGTH = 250
 
 # sudoku lookup dictionaries
 coord_lookup = {}
@@ -277,6 +278,7 @@ def in_small_box(x, y, current_large):
         
     return False, None
 
+
 def in_new_game(x, y):
     """check if mouse/click occured on generate new game button"""
     if x >= GAME_SECTION + 100 and x <= GAME_SECTION + MENU_SECTION - 100:
@@ -292,12 +294,46 @@ def in_solve(x, y):
             return True
     return False
 
+
 def in_check(x, y):
     """check if mouse hover/click occured on check button"""
     if x >= GAME_SECTION + 100 and x <= GAME_SECTION + MENU_SECTION - 100:
         if y >= 240 and y <= 280:
             return True
     return False    
+    
+    
+def in_x_face(x, y, vertices):
+    """check if mouse hover/click occured on x face of cube"""
+    return in_polygon((x, y), [vertices[0], vertices[6], vertices[2], vertices[1]])
+
+
+def in_y_face(x, y, vertices):
+    """check if mouse hover/click occured on y face of cube"""
+    return in_polygon((x, y), [vertices[0], vertices[5], vertices[4], vertices[6]])
+
+
+def in_z_face(x, y, vertices):
+    """check if mouse hover/click occured on z face of cube"""
+    return in_polygon((x, y), [vertices[2], vertices[6], vertices[4], vertices[3]])
+    
+    
+def in_polygon(point, vertices):
+    """check if a given point is in a polygon determined by the vertices"""
+    current = 0
+    while current + 1 != len(vertices):
+        
+        edge_vector = tuple(map(lambda x : x[0] - x[1], zip(vertices[current + 1], vertices[current]))) 
+        point_vector = tuple(map(lambda x : x[0] - x[1], zip(point, vertices[current])))
+        
+        #print(edge_vector[0] * point_vector[1] - point_vector[0]*edge_vector[1])
+        if edge_vector[0] * point_vector[1] - edge_vector[1] * point_vector[0] < 0:
+            #signed area is negative, point is on wrong side of edge
+            return False
+        
+        current += 1
+        
+    return True
     
     
 def select_box(x, y, current_large):
@@ -323,14 +359,20 @@ def update_display(cube, current_large, current_dim, incorrect, vertices, select
     """ redraw display """
     DISPLAY.fill(WHITE)
     draw_all_grids(current_large)
+    draw_menu(vertices)
+    
     if current_dim == "x":
         cube_ls = cube.x_elements
+        draw_x_view_parallelogram(vertices, fill_colour=YELLOW)
+        
     elif current_dim == "y":
         cube_ls = cube.y_elements
+        draw_y_view_parallelogram(vertices, fill_colour=YELLOW)
     else:
         cube_ls = cube.z_elements
+        draw_z_view_parallelogram(vertices, fill_colour=YELLOW)
     populate_all_cells(cube_ls, current_large)
-    draw_menu(vertices)
+    
     
     if mouse_x is not None and mouse_y is not None:
         if in_large_box(mouse_x, mouse_y, current_large):
@@ -346,6 +388,22 @@ def update_display(cube, current_large, current_dim, incorrect, vertices, select
         elif in_new_game(mouse_x, mouse_y):
             #give blue border to new game box
             draw_new_game(BLUE)
+        elif in_x_face(mouse_x, mouse_y, vertices):
+            #give x face blue border
+            if current_dim == 'x':
+                draw_x_view_parallelogram(vertices, BLUE, YELLOW)
+            else:
+                draw_x_view_parallelogram(vertices, BLUE)
+        elif in_y_face(mouse_x, mouse_y, vertices):
+            if current_dim == 'y':
+                draw_y_view_parallelogram(vertices, BLUE, YELLOW)
+            else:
+                draw_y_view_parallelogram(vertices, BLUE)
+        elif in_z_face(mouse_x, mouse_y, vertices):
+            if current_dim == 'z':
+                draw_z_view_parallelogram(vertices, BLUE, YELLOW)
+            else:
+                draw_z_view_parallelogram(vertices, BLUE)
             
     if selected is not None:
         #give border to current selected box
@@ -353,6 +411,7 @@ def update_display(cube, current_large, current_dim, incorrect, vertices, select
         
     #highlight any incorrect squares red
     mark_incorrect(current_dim, incorrect, current_large)
+    label_cube(vertices)
         
         
 def get_grid_coords(x, y, z, current_large):
@@ -392,6 +451,7 @@ def draw_menu(vertices):
     draw_check(BLACK)
     
     draw_3D_cube(vertices)
+    label_cube(vertices)
     
     
 def draw_new_game(COLOUR):
@@ -446,22 +506,41 @@ def draw_3D_cube(vertices):
     draw_z_view_parallelogram(vertices)
     
     
-def draw_x_view_parallelogram(vertices, border_colour=BLACK, fill_colour=WHITE):
+def label_cube(vertices):
+    """label the faces of the cube"""
+    x_surf = LARGE_FONT.render("X", True, BLACK)
+    x_rect = x_surf.get_rect()
+    x_rect.topleft = ((vertices[0][0] + vertices[2][0]) / 2 , (vertices[2][1] + vertices[0][1]) / 2 - 12)
+    DISPLAY.blit(x_surf, x_rect)
+    
+    y_surf = LARGE_FONT.render("Y", True, BLACK)
+    y_rect = y_surf.get_rect()
+    y_rect.topleft = ((vertices[5][0] + vertices[6][0]) / 2 - 12, (vertices[6][1] + vertices[5][1]) / 2 - 12)
+    DISPLAY.blit(y_surf, y_rect)
+    
+    z_surf = LARGE_FONT.render("Z", True, BLACK)
+    z_rect = z_surf.get_rect()
+    z_rect.topleft = ((vertices[4][0] + vertices[2][0]) / 2 - 10, (vertices[2][1] + vertices[4][1]) / 2 - 12)
+    DISPLAY.blit(z_surf, z_rect)       
+    
+    
+def draw_x_view_parallelogram(vertices, border_colour=BLACK, fill_colour=GRAY):
     """draw the x_view face of the cube"""
     pygame.draw.polygon(DISPLAY, fill_colour, (vertices[0], vertices[1], vertices[2], vertices[6]))
     pygame.draw.polygon(DISPLAY, border_colour, (vertices[0], vertices[1], vertices[2], vertices[6]), 5)
     
     
-def draw_y_view_parallelogram(vertices, border_colour=BLACK, fill_colour=WHITE):
+def draw_y_view_parallelogram(vertices, border_colour=BLACK, fill_colour=DARKGRAY):
+    """draw the z_view face of the cube"""
+    pygame.draw.polygon(DISPLAY, fill_colour, (vertices[0], vertices[6], vertices[4], vertices[5]))
+    pygame.draw.polygon(DISPLAY, border_colour, (vertices[0], vertices[6], vertices[4], vertices[5]), 5)
+    
+    
+def draw_z_view_parallelogram(vertices, border_colour=BLACK, fill_colour=WHITE):
     """draw the y_view face of the cube"""
     pygame.draw.polygon(DISPLAY, fill_colour, (vertices[6], vertices[2], vertices[3], vertices[4]))
     pygame.draw.polygon(DISPLAY, border_colour, (vertices[6], vertices[2], vertices[3], vertices[4]), 5)
     
-    
-def draw_z_view_parallelogram(vertices, border_colour=BLACK, fill_colour=WHITE):
-    """draw the z_view face of the cube"""
-    pygame.draw.polygon(DISPLAY, fill_colour, (vertices[0], vertices[6], vertices[4], vertices[5]))
-    pygame.draw.polygon(DISPLAY, border_colour, (vertices[0], vertices[6], vertices[4], vertices[5]), 5)
     
     
 def get_value(key, val=""):
@@ -499,7 +578,7 @@ def main():
     pygame.display.set_caption('3D Sudoku')
     get_all_grid_coordinates(current_large)
     vertices = get_cube_vertices()
-    
+
     solved_cube_ls = generate_3d_board()
     solution = copy.deepcopy(solved_cube_ls)
     game_cube = convert_to_game(solved_cube_ls)
@@ -584,6 +663,15 @@ def main():
             elif in_check(mouse_x, mouse_y):
                 #get incorrect values
                 incorrect = cube.check(solved_cube)
+                
+            elif in_x_face(mouse_x, mouse_y, vertices):
+                current_dim = "x"
+                
+            elif in_y_face(mouse_x, mouse_y, vertices):
+                current_dim = "y"
+                
+            elif in_z_face(mouse_x, mouse_y, vertices):
+                current_dim = "z"
             
         # redraw everything
         get_all_grid_coordinates(current_large)
