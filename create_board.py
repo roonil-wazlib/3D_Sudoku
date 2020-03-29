@@ -437,7 +437,7 @@ def mark_incorrect(current_dim, incorrect, current_large):
         elif current_dim == "y":
             x, y, is_big = get_grid_coords(item[0], item[2], item[1], current_large)
         else:
-            x, y, is_big = get_grid_coords(item[2], item[0], item[1], current_large)
+            x, y, is_big = get_grid_coords(item[1], item[2], item[0], current_large)
         if is_big:
             highlight_large_cell(x, y, RED)
         else:
@@ -474,7 +474,7 @@ def draw_solve(COLOUR):
     
     
 def draw_check(COLOUR):
-    """drwa check game button"""
+    """draw check game button"""
     pygame.draw.rect(DISPLAY, COLOUR, (GAME_SECTION + 100, 240, MENU_SECTION - 200, 40), 2)
     check_surf = LARGE_FONT.render("CHECK", True, BLACK)
     check_rect = check_surf.get_rect()
@@ -634,7 +634,7 @@ def main():
                             cube.insert_value(val, z, y, x)
                             
                         else:
-                            cube.insert_value(val, z, x, y)
+                            cube.insert_value(val, y, z, x)
     
         if has_clicked:
             in_small, coords = in_small_box(mouse_x, mouse_y, current_large)

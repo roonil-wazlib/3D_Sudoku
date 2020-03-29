@@ -118,12 +118,15 @@ def generate_3d_board():
 def convert_to_game(cube):
     """ convert a valid Sudoku cube to a solvable game """
     game_cube = cube[:]
-    for i in range(600):
-        #at least the remaining 379 elements will still be there
+    count = 0
+    #remove 500 elements from the cube at random
+    while count < 500:
         x = random.randrange(0,9,1)
         y = random.randrange(0,9,1)
         z = random.randrange(0,9,1)
-        game_cube[x][y][z] = ""
+        if game_cube[x][y][z] != "":
+            count += 1
+            game_cube[x][y][z] = ""
         
     return game_cube
     
