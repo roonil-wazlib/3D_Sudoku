@@ -341,6 +341,31 @@ def draw_menu():
     
     
     
+def get_value(key, val=""):
+    """ get value of number key typed """
+    if key == pygame.K_1:
+        val = 1
+    elif key == pygame.K_2:
+        val = 2
+    elif key == pygame.K_3:
+        val = 3
+    elif key == pygame.K_4:
+        val = 4
+    elif key == pygame.K_5:
+        val = 5
+    elif key == pygame.K_6:
+        val = 6
+    elif key == pygame.K_7:
+        val = 7
+    elif key == pygame.K_8:
+        val = 8
+    elif key == pygame.K_9:
+        val = 9
+    elif key == pygame.K_0:
+        val = 0
+        
+    return val
+    
     
 def main():
     #start with center board in focus
@@ -376,28 +401,8 @@ def main():
                 has_clicked = True
                 
             elif event.type == pygame.KEYDOWN:
-                
-                if event.key == pygame.K_1:
-                    val = 1
-                elif event.key == pygame.K_2:
-                    val = 2
-                elif event.key == pygame.K_3:
-                    val = 3
-                elif event.key == pygame.K_4:
-                    val = 4
-                elif event.key == pygame.K_5:
-                    val = 5
-                elif event.key == pygame.K_6:
-                    val = 6
-                elif event.key == pygame.K_7:
-                    val = 7
-                elif event.key == pygame.K_8:
-                    val = 8
-                elif event.key == pygame.K_9:
-                    val = 9
-                elif event.key == pygame.K_0:
-                    val = 0
-                elif event.key == pygame.K_x:
+
+                if event.key == pygame.K_x:
                     #flip to x view
                     current_dim = "x"
                     
@@ -409,21 +414,26 @@ def main():
                     #flip to z view
                     current_dim = "z"
                     
-                if selected is not None:
-                    #get coordinates of selected
-                    x, y = get_selected_coordinates(*selected, current_large)
-                    z = current_large - 1
-                    if current_dim == "x":
-                        game_cube[z][x][y] = val
-                        cube = Sudoku3D(game_cube)
+                else:
+                    val = get_value(event.key)
+                    
+                    if selected is not None and val != "":
+                        #get coordinates of selected square
+                        x, y = get_selected_coordinates(*selected, current_large)
+                        z = current_large - 1
                         
-                    elif current_dim == "y":
-                        game_cube[x][z][y] = val
-                        cube = Sudoku3D(game_cube)
-                        
-                    else:
-                        game_cube[x][y][z] = val
-                        cube = Sudoku3D(game_cube)                   
+                        #update value of that square
+                        if current_dim == "x":
+                            game_cube[z][x][y] = val
+                            cube = Sudoku3D(game_cube)
+                            
+                        elif current_dim == "y":
+                            game_cube[x][z][y] = val
+                            cube = Sudoku3D(game_cube)
+                            
+                        else:
+                            game_cube[x][y][z] = val
+                            cube = Sudoku3D(game_cube)
     
         if has_clicked:
             in_small, coords = in_small_box(mouse_x, mouse_y, current_large)

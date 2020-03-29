@@ -118,7 +118,7 @@ def generate_3d_board():
 def convert_to_game(cube):
     """ convert a valid Sudoku cube to a solvable game """
     game_cube = cube[:]
-    for i in range(500):
+    for i in range(600):
         #at least the remaining 379 elements will still be there
         x = random.randrange(0,9,1)
         y = random.randrange(0,9,1)
