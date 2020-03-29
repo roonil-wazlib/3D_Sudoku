@@ -44,6 +44,7 @@ TURQOISE = (0, 255, 255, 70)
 GREEN = (0, 255, 0, 70)
 PURPLE1 = (140,0,255,70)
 PURPLE2 = (255,0,140,70)
+RED = (255, 0, 0, 70)
 
 # font info
 SMALL_FONT_SIZE = 15
@@ -272,6 +273,28 @@ def in_small_box(x, y, current_large):
             return True, (a,b)
         
     return False, None
+
+def in_new_game(x, y):
+    """check if mouse/click occured on generate new game button"""
+    if x >= GAME_SECTION + 100 and x <= GAME_SECTION + MENU_SECTION - 100:
+        if y >= 120 and y <= 160:
+            return True
+    return False
+
+
+def in_solve(x, y):
+    """check if mouse hover/click occured on solve button"""
+    if x >= GAME_SECTION + 100 and x <= GAME_SECTION + MENU_SECTION - 100:
+        if y >= 180 and y <= 220:
+            return True
+    return False
+
+def in_check(x, y):
+    """check if mouse hover/click occured on check button"""
+    if x >= GAME_SECTION + 100 and x <= GAME_SECTION + MENU_SECTION - 100:
+        if y >= 240 and y <= 280:
+            return True
+    return False    
     
     
 def select_box(x, y, current_large):
@@ -293,7 +316,7 @@ def get_selected_coordinates(x, y, current_large):
     return x, y
     
     
-def update_display(cube, current_large, current_dim, selected=None, mouse_x=None, mouse_y=None):
+def update_display(cube, current_large, current_dim, incorrect, selected=None, mouse_x=None, mouse_y=None):
     """ redraw display """
     DISPLAY.fill(WHITE)
     draw_all_grids(current_large)
@@ -313,32 +336,85 @@ def update_display(cube, current_large, current_dim, selected=None, mouse_x=None
         in_small, coords = in_small_box(mouse_x, mouse_y, current_large)
         if in_small:
             draw_small_box(*coords, current_large)
+        elif in_check(mouse_x, mouse_y):
+            draw_check(BLUE)
+        elif in_solve(mouse_x, mouse_y):
+            draw_solve(BLUE)
+        elif in_new_game(mouse_x, mouse_y):
+            #give blue border to new game box
+            draw_new_game(BLUE)
             
     if selected is not None:
+        #give border to current selected box
         select_box(*selected, current_large)
-            
+        
+    #highlight any incorrect squares red
+    mark_incorrect(current_dim, incorrect, current_large)
+        
+        
+def get_grid_coords(x, y, z, current_large):
+    """get the grid coordinates of a value from it's in-cube coordinates"""
+    board = z + 1
+    board_coordinates = coord_lookup[board]
     
+    if board == current_large:
+        x_coord = y * LARGE_CELL_SIZE + board_coordinates[0]
+        y_coord = x * LARGE_CELL_SIZE + board_coordinates[1]
+    else:
+        x_coord = y * SMALL_CELL_SIZE + board_coordinates[0]
+        y_coord = x * SMALL_CELL_SIZE + board_coordinates[1]
+        
+    return x_coord, y_coord, board == current_large
+        
+            
+def mark_incorrect(current_dim, incorrect, current_large):
+    """mark the incorrect squares in red"""
+    for item in incorrect:
+        if current_dim == "x":
+            x, y, is_big = get_grid_coords(*item, current_large)
+        elif current_dim == "y":
+            x, y, is_big = get_grid_coords(item[0], item[2], item[1], current_large)
+        else:
+            x, y, is_big = get_grid_coords(item[2], item[0], item[1], current_large)
+        if is_big:
+            highlight_large_cell(x, y, RED)
+        else:
+            highlight_small_cell(x, y, RED)
+            
     
 def draw_menu():
     """ draw menu """
-    # draw menu box
-    #pygame.draw.rect(DISPLAY, BLACK, (GAME_SECTION + 10, 10, MENU_SECTION - 20, WINDOW_Y - 30), 5)
+    draw_new_game(BLACK)
+    draw_solve(BLACK)
+    draw_check(BLACK)
     
-    # draw generate button
-    pygame.draw.rect(DISPLAY, BLACK, (GAME_SECTION + 100, 120, MENU_SECTION - 200, 40), 2)
+    
+def draw_new_game(COLOUR):
+    """draw new game button"""
+    # draw new gamebutton
+    pygame.draw.rect(DISPLAY, COLOUR, (GAME_SECTION + 100, 120, MENU_SECTION - 200, 40), 2)
     generate_surf = LARGE_FONT.render("NEW GAME", True, BLACK)
     generate_rect = generate_surf.get_rect()
     generate_rect.topleft = (GAME_SECTION + 220, 128)
-    DISPLAY.blit(generate_surf, generate_rect)
+    DISPLAY.blit(generate_surf, generate_rect)    
     
     
-    # draw solve button
-    pygame.draw.rect(DISPLAY, BLACK, (GAME_SECTION + 100, 180, MENU_SECTION - 200, 40), 2)
+def draw_solve(COLOUR):
+    """draw solve button"""
+    pygame.draw.rect(DISPLAY, COLOUR, (GAME_SECTION + 100, 180, MENU_SECTION - 200, 40), 2)
     generate_surf = LARGE_FONT.render("SOLVE", True, BLACK)
     generate_rect = generate_surf.get_rect()
     generate_rect.topleft = (GAME_SECTION + 260, 188)
-    DISPLAY.blit(generate_surf, generate_rect)    
+    DISPLAY.blit(generate_surf, generate_rect)
     
+    
+def draw_check(COLOUR):
+    """drwa check game button"""
+    pygame.draw.rect(DISPLAY, COLOUR, (GAME_SECTION + 100, 240, MENU_SECTION - 200, 40), 2)
+    check_surf = LARGE_FONT.render("CHECK", True, BLACK)
+    check_rect = check_surf.get_rect()
+    check_rect.topleft = (GAME_SECTION + 255, 248)
+    DISPLAY.blit(check_surf, check_rect)    
     
     
 def get_value(key, val=""):
@@ -371,6 +447,7 @@ def main():
     #start with center board in focus
     current_large = 5
     current_dim = "x"
+    incorrect = []
     
     pygame.display.set_caption('3D Sudoku')
     get_all_grid_coordinates(current_large)
@@ -381,7 +458,7 @@ def main():
     solved_cube = Sudoku3D(solution)
     cube = Sudoku3D(game_cube, False)
     
-    update_display(cube, current_large, current_dim)
+    update_display(cube, current_large, current_dim, incorrect)
     
     selected = None
     
@@ -444,7 +521,7 @@ def main():
                 #set current selection to something
                 selected = (mouse_x, mouse_y)
                 
-            elif mouse_x >= GAME_SECTION + 100 and mouse_x <= GAME_SECTION + MENU_SECTION - 100 and mouse_y >= 120 and mouse_y <= 160:
+            elif in_new_game(mouse_x, mouse_y):
                 #generate new game
                 solved_cube_ls = generate_3d_board()
                 solution = copy.deepcopy(solved_cube_ls)
@@ -452,14 +529,17 @@ def main():
                 solved_cube = Sudoku3D(solution)
                 cube = Sudoku3D(game_cube, False)
                 
-            elif mouse_x >= GAME_SECTION + 100 and mouse_x <= GAME_SECTION + MENU_SECTION - 100 and mouse_y >= 180 and mouse_y <= 220:
+            elif in_solve(mouse_x, mouse_y):
                 #solve game
-                #when rotations are working you will need to check you display the right one here
                 cube = solved_cube
+                
+            elif in_check(mouse_x, mouse_y):
+                #get incorrect values
+                incorrect = cube.check(solved_cube)
             
         # redraw everything
         get_all_grid_coordinates(current_large)
-        update_display(cube, current_large, current_dim, selected, mouse_x, mouse_y)    
+        update_display(cube, current_large, current_dim, incorrect, selected, mouse_x, mouse_y)    
     
         pygame.display.update()    
         FPSCLOCK.tick(FPS)        

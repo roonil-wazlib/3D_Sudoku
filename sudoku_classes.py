@@ -98,6 +98,18 @@ class Sudoku3D(Sudoku):
         self.x_elements[z].insert_value(val, x, y)
         self.y_elements[x].insert_value(val, z, y)
         self.z_elements[x].insert_value(val, y, z)
+        
+        
+    def check(self, solution):
+        """return a list of values that player has entered incorrectly"""
+        incorrect = []
+        for x in range(len(self)):
+            for y in range(len(self)):
+                for z in range(len(self)):
+                    if self.x_elements[z][y][x] != solution.x_elements[z][y][x] and self.x_elements[z][y][x] != "":
+                        incorrect.append((x,y,z))
+                        
+        return incorrect
     
         
     def get_x_view(self):
@@ -133,5 +145,9 @@ class Sudoku3D(Sudoku):
             
         z_view = [Sudoku(x, self.solution) for x in z_view]
         return z_view
+    
+    
+    def __len__(self):
+        return len(self.x_elements) #doesn't matter which dimension - it's a cube
             
             
