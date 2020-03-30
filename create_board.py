@@ -691,8 +691,8 @@ def main():
                 cube = Sudoku3D(game_cube, False)
                 
             elif in_solve(mouse_x, mouse_y):
-                #solve game
-                #cube = solved_cube
+                #to solve the game instantly replace the rest of this branch with the next line
+                #cube = solved_cube 
                 #check here to see if any incorrect entries
                 incorrect = cube.check(solved_cube)
                 for item in incorrect:
