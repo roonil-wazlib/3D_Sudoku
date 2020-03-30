@@ -1,22 +1,18 @@
 from sudoku_classes import *
 from generate_sudoku import *
+from create_board import *
 import copy
+import time
 
 class Solver:
     
-    def __init__(self, cube, display=None):
-        self.display = display
+    def __init__(self, cube, vertices=None):
+        self.vertices = vertices
         self.solver = self.setup_sets(copy.deepcopy(cube))
         self.cube = cube
         self.is_incomplete = True
         
         while(self.is_incomplete):
-            #for i in range(len(self.cube.x_elements)):
-                #print(self.cube.x_elements[i])
-                #print("\n\n")
-                #print(self.solver.x_elements[i])
-                #print("\n\n")
-                
             self.loop_cube()
             
             
@@ -38,7 +34,7 @@ class Solver:
     
     def set_system_of_representatives(self, x, y, z):
         current_set = self.solver.x_elements[x][y][z]
-        #print(x,y,z)
+
         #eliminate elements from same row
         for i in range(9):
             if self.cube.x_elements[x][i][z] in current_set:
@@ -73,7 +69,13 @@ class Solver:
             for y in range(len(self.cube)):
                 for z in range(len(self.cube)):
                     if self.cube.x_elements[x][y][z] == "":
-                        #print("CUBE", self.cube.x_elements[x])
+                        if self.vertices is not None:
+                            #update display to be like a mouse hovering over current cell
+                            get_all_grid_coordinates(x+1)
+                            mouse_x, mouse_y, _ = get_grid_coords(z,y,x,x+1)
+                            update_display(self.cube, x+1, "x", [], self.vertices, mouse_x=mouse_x, mouse_y=mouse_y)
+                            pygame.display.update()
+                            FPSCLOCK.tick(FPS)                   
                         self.set_system_of_representatives(x, y, z)
                         self.is_incomplete = True
                         

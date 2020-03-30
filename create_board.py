@@ -2,6 +2,7 @@ import pygame, sys
 import copy
 from pygame.locals import *
 from generate_sudoku import *
+from solver import *
 
 pygame.init()
 
@@ -29,7 +30,7 @@ WINDOW_Y = GAME_SECTION
 FPSCLOCK = pygame.time.Clock()
 DISPLAY = pygame.display.set_mode((WINDOW_X, WINDOW_Y))
 
-FPS = 10
+FPS = 20
 
 # colours for text, background and grids
 BLACK = (0, 0, 0)
@@ -116,7 +117,6 @@ def draw_large_grid(x, y):
      
 def draw_all_grids(current_large):
     """ draw all small and large grid lines """
-    
     (a,b) = coord_lookup[current_large]
     
     # draw the small grids
@@ -675,7 +675,10 @@ def main():
             
         # redraw everything
         get_all_grid_coordinates(current_large)
-        update_display(cube, current_large, current_dim, incorrect, vertices, selected, mouse_x, mouse_y)    
+        update_display(cube, current_large, current_dim, incorrect, vertices, selected, mouse_x, mouse_y)
+        
+        print("GO")
+        solver = Solver(cube, vertices)
     
         pygame.display.update()    
         FPSCLOCK.tick(FPS)        
