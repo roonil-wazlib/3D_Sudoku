@@ -81,6 +81,7 @@ def rows_to_columns(board):
     
     
 def shuffle_cube(cube):
+    """shuffle the columns around within the 3D implementation"""
     shuffled = []
     column_group_order = [0,1,2]
     random.shuffle(column_group_order)
