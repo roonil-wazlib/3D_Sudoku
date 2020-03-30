@@ -38,8 +38,6 @@ class Solver:
         #eliminate elements from same row
         for i in range(9):
             if self.cube.x_elements[x][i][z] in current_set:
-                #print(current_set)
-                #print(self.cube.x_elements[x][i][z])
                 current_set.remove(self.cube.x_elements[x][i][z])
                 
         #eliminate elements from same column
@@ -52,8 +50,21 @@ class Solver:
             if self.cube.x_elements[x][y][i] in current_set:
                 current_set.remove(self.cube.x_elements[x][y][i])
                 
+                
+        #eliminate elements from same subsquare
+        #subsquare coords : y // 3, z // 3
+        #fix x
+        for i in range(3):
+            for j in range(3):
+                if self.cube.x_elements[x][3*(y//3)+j][3*(z//3)+i] in current_set:
+                    current_set.remove(self.cube.x_elements[x][3*(y//3)+j][3*(z//3)+i])
+                if self.cube.x_elements[3*(x//3)+j][y][3*(z//3)+i] in current_set:
+                    current_set.remove(self.cube.x_elements[3*(x//3)+j][y][3*(z//3)+i])
+                if self.cube.x_elements[3*(x//3)+j][3*(y//3)+i][z] in current_set:
+                    current_set.remove(self.cube.x_elements[3*(x//3)+j][3*(y//3)+i][z])
         
         self.solver.insert_value(current_set, y, z, x)
+        print(current_set)
         
         if len(current_set) == 1:
             self.cube.insert_value(list(current_set)[0], y, z, x)
