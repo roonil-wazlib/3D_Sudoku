@@ -15,14 +15,23 @@ the values 1-9, ordered with modular arithmetic such that the properties of a Su
 2x2 board that looks like:
 
 1 2 3 4 5 6 7 8 9
+
 4 5 6 7 8 9 1 2 3
+
 7 8 9 1 2 3 4 5 6
+
 2 3 4 5 6 7 8 9 1
+
 5 6 7 8 9 1 2 3 4
+
 8 9 1 2 3 4 5 6 7
+
 3 4 5 6 7 8 9 1 2
+
 6 7 8 9 1 2 3 4 5
+
 9 1 2 3 4 5 6 7 8
+
 
 Then, in order to give the game a semi-random appearance, the board is 'shuffled' such that the Sudoku properties are maintained.
 Thus, we can shuffle rows and columns within each 3x9 and 9x3 rectangle, and we can shuffle the orders of the rectangles within
