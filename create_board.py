@@ -564,6 +564,7 @@ def get_value(key, val=""):
         val = 9
     elif key == pygame.K_0:
         val = 0
+    #TODO add delete option
         
     return val
     

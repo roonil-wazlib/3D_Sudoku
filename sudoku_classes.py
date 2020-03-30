@@ -98,7 +98,6 @@ class Sudoku3D(Sudoku):
         self.y_elements[x].insert_value(val, z, y)
         #self.z_elements[z].insert_value(val, y, x) - figure this out
         
-        #self.y_elements = self.get_y_view()
         self.z_elements = self.get_z_view()
         
         
