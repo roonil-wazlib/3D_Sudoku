@@ -19,7 +19,9 @@ class Solver:
                 
                 
     def setup_sets(self, cube):
-        """replace empty squares with set containing all possible values"""
+        """
+        replace all empty squares with set containing all possible values
+        """
         
         representatives = {1, 2, 3, 4, 5, 6, 7, 8, 9}
         
@@ -33,6 +35,12 @@ class Solver:
     
     
     def set_system_of_representatives(self, x, y, z):
+        """
+        set the value of an unknown cell at coordinates (x,y,z) to be a set consisting of
+        all elements not contained in the cell's corresponding rows, columns and subsquares
+        in any direction
+        """
+        
         current_set = self.solver.x_elements[x][y][z]
 
         #eliminate elements from same row
@@ -72,7 +80,9 @@ class Solver:
             
             
     def loop_cube(self):
-        """loop through entire cube defining system of representatives of values that can go in each cell"""
+        """
+        loop through entire cube defining system of representatives of values that can go in each cell
+        """
         
         self.is_incomplete = False
         for x in range(len(self.cube)):
@@ -81,11 +91,14 @@ class Solver:
                     if self.cube.x_elements[x][y][z] == "":
                         if self.vertices is not None:
                             #update display to be like a mouse hovering over current cell
+                            #but only if this has been called with vertices initalised, because running
+                            #the visuals is time consuming
                             get_all_grid_coordinates(x+1)
                             mouse_x, mouse_y, _ = get_grid_coords(z,y,x,x+1)
                             update_display(self.cube, x+1, "x", [], self.vertices, mouse_x=mouse_x, mouse_y=mouse_y)
                             pygame.display.update()
-                            FPSCLOCK.tick(FPS)                   
+                            FPSCLOCK.tick(FPS)             
+                            
                         self.set_system_of_representatives(x, y, z)
                         self.is_incomplete = True
                         
