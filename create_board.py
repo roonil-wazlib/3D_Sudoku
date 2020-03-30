@@ -64,24 +64,10 @@ CUBE_SIDE_LENGTH = 250
 coord_lookup = {}
 board_number_lookup = {}
 
-
-def get_all_grid_coordinates(current_large):
-    """ populate dictionaries with coordinates of each grid and corresponding grid number """
     
-    for index, x in enumerate(POSSIBLE_COORDINATES_1D):
-        for index2, y in enumerate(POSSIBLE_COORDINATES_1D):
-            if index + 3*index2 == current_large - 1:
-                pass
-            else:
-                board_number_lookup[(x,y)] = index + 3*index2 + 1
-                coord_lookup[index + 3*index2 + 1] = (x,y)
-                
-
-    large_x = ((current_large - 1) % 3) * LARGE_DIMENSION + BORDER
-    large_y = ((current_large - 1) // 3) * LARGE_DIMENSION + BORDER
-    board_number_lookup[(large_x, large_y)] = current_large
-    coord_lookup[current_large] = (large_x, large_y)
-    
+#-------------------------------------------------------------------------------
+# DRAW GRIDS AND NUMBERS
+#-------------------------------------------------------------------------------
     
 def draw_small_grid(x, y):
     """ draw a small grid starting at (x, y) coordinates """
@@ -176,6 +162,12 @@ def populate_all_cells(cube, current_large):
     #populate large cells
     populate_cells_large(cube[current_large - 1], a, b, current_large)
     
+
+
+#-------------------------------------------------------------------------------
+# BORDERING AND HIGHLIGHTING SUDOKU CELLS
+#-------------------------------------------------------------------------------
+    
     
 def draw_large_box(x, y, current_large):
     """ draw box around cell that is hovered over """
@@ -211,6 +203,31 @@ def draw_small_box(x, y, current_large):
     cell_y = b + ((y - b) // LARGE_CELL_SIZE) * LARGE_CELL_SIZE    
     pygame.draw.rect(DISPLAY, BLUE, (x, y, SMALL_DIMENSION, SMALL_DIMENSION), 2)
     
+    
+    
+def mark_incorrect(current_dim, incorrect, current_large):
+    """mark the incorrect squares in red"""
+    for item in incorrect:
+        if current_dim == "x":
+            x, y, is_big = get_grid_coords(*item, current_large)
+        elif current_dim == "y":
+            x, y, is_big = get_grid_coords(item[0], item[2], item[1], current_large)
+        else:
+            x, y, is_big = get_grid_coords(item[1], item[2], item[0], current_large)
+        if is_big:
+            highlight_large_cell(x, y, RED)
+        else:
+            highlight_small_cell(x, y, RED)
+            
+            
+def select_box(x, y, current_large):
+    """highlight the selected box"""
+    (a,b) = coord_lookup[current_large]
+    
+    cell_x = a + ((x - a) // LARGE_CELL_SIZE) * LARGE_CELL_SIZE
+    cell_y = b + ((y - b) // LARGE_CELL_SIZE) * LARGE_CELL_SIZE
+    pygame.draw.rect(DISPLAY, ORANGE, (cell_x, cell_y, LARGE_CELL_SIZE, LARGE_CELL_SIZE), 2)
+            
     
 def highlight_relevant_cells(x, y, current_large):
     """highlight the cells of elements 'related' to hovered over element"""
@@ -258,7 +275,10 @@ def highlight_relevant_cells(x, y, current_large):
                     #same subsquare looking at the cube from the side
                     highlight_small_cell(x + i * SMALL_CELL_SIZE, y + j * SMALL_CELL_SIZE, PURPLE2)
           
-                
+               
+#-------------------------------------------------------------------------------
+# CHECK POSITIONING OF MOUSE
+#-------------------------------------------------------------------------------
 
 def in_large_box(x, y, current_large):
     """ check if mouse hovering over large Sudoku """
@@ -336,82 +356,27 @@ def in_polygon(point, vertices):
     return True
     
     
-def select_box(x, y, current_large):
-    """highlight the selected box"""
-    (a,b) = coord_lookup[current_large]
+#-------------------------------------------------------------------------------
+# CONVERTING BETWEEN CUBE COORDINATES AND PYGAME COORDINATES
+#-------------------------------------------------------------------------------
     
-    cell_x = a + ((x - a) // LARGE_CELL_SIZE) * LARGE_CELL_SIZE
-    cell_y = b + ((y - b) // LARGE_CELL_SIZE) * LARGE_CELL_SIZE
-    pygame.draw.rect(DISPLAY, ORANGE, (cell_x, cell_y, LARGE_CELL_SIZE, LARGE_CELL_SIZE), 2)
+def get_all_grid_coordinates(current_large):
+    """ populate dictionaries with coordinates of each grid and corresponding grid number """
     
-    
-def get_selected_coordinates(x, y, current_large):
-    """get coordinates from x perspective of selected box"""
-    (a,b) = coord_lookup[current_large]
-    
-    x = ((x - a) // LARGE_CELL_SIZE)
-    y = ((y - b) // LARGE_CELL_SIZE)
-    
-    return x, y
-    
-    
-def update_display(cube, current_large, current_dim, incorrect, vertices, selected=None, mouse_x=None, mouse_y=None):
-    """ redraw display """
-    DISPLAY.fill(WHITE)
-    draw_all_grids(current_large)
-    draw_menu(vertices)
-    
-    if current_dim == "x":
-        cube_ls = cube.x_elements
-        draw_x_view_parallelogram(vertices, fill_colour=YELLOW)
-        
-    elif current_dim == "y":
-        cube_ls = cube.y_elements
-        draw_y_view_parallelogram(vertices, fill_colour=YELLOW)
-    else:
-        cube_ls = cube.z_elements
-        draw_z_view_parallelogram(vertices, fill_colour=YELLOW)
-    populate_all_cells(cube_ls, current_large)
-    
-    
-    if mouse_x is not None and mouse_y is not None:
-        if in_large_box(mouse_x, mouse_y, current_large):
-            highlight_relevant_cells(mouse_x, mouse_y, current_large)
-            draw_large_box(mouse_x, mouse_y, current_large)
-        in_small, coords = in_small_box(mouse_x, mouse_y, current_large)
-        if in_small:
-            draw_small_box(*coords, current_large)
-        elif in_check(mouse_x, mouse_y):
-            draw_check(BLUE)
-        elif in_solve(mouse_x, mouse_y):
-            draw_solve(BLUE)
-        elif in_new_game(mouse_x, mouse_y):
-            #give blue border to new game box
-            draw_new_game(BLUE)
-        elif in_x_face(mouse_x, mouse_y, vertices):
-            #give x face blue border
-            if current_dim == 'x':
-                draw_x_view_parallelogram(vertices, BLUE, YELLOW)
+    for index, x in enumerate(POSSIBLE_COORDINATES_1D):
+        for index2, y in enumerate(POSSIBLE_COORDINATES_1D):
+            if index + 3*index2 == current_large - 1:
+                pass
             else:
-                draw_x_view_parallelogram(vertices, BLUE)
-        elif in_y_face(mouse_x, mouse_y, vertices):
-            if current_dim == 'y':
-                draw_y_view_parallelogram(vertices, BLUE, YELLOW)
-            else:
-                draw_y_view_parallelogram(vertices, BLUE)
-        elif in_z_face(mouse_x, mouse_y, vertices):
-            if current_dim == 'z':
-                draw_z_view_parallelogram(vertices, BLUE, YELLOW)
-            else:
-                draw_z_view_parallelogram(vertices, BLUE)
-            
-    if selected is not None:
-        #give border to current selected box
-        select_box(*selected, current_large)
-        
-    #highlight any incorrect squares red
-    mark_incorrect(current_dim, incorrect, current_large)
-    label_cube(vertices)
+                board_number_lookup[(x,y)] = index + 3*index2 + 1
+                coord_lookup[index + 3*index2 + 1] = (x,y)
+                
+
+    large_x = ((current_large - 1) % 3) * LARGE_DIMENSION + BORDER
+    large_y = ((current_large - 1) // 3) * LARGE_DIMENSION + BORDER
+    board_number_lookup[(large_x, large_y)] = current_large
+    coord_lookup[current_large] = (large_x, large_y)
+
         
         
 def get_grid_coords(x, y, z, current_large):
@@ -426,23 +391,23 @@ def get_grid_coords(x, y, z, current_large):
         x_coord = y * SMALL_CELL_SIZE + board_coordinates[0]
         y_coord = x * SMALL_CELL_SIZE + board_coordinates[1]
         
-    return x_coord, y_coord, board == current_large
-        
-            
-def mark_incorrect(current_dim, incorrect, current_large):
-    """mark the incorrect squares in red"""
-    for item in incorrect:
-        if current_dim == "x":
-            x, y, is_big = get_grid_coords(*item, current_large)
-        elif current_dim == "y":
-            x, y, is_big = get_grid_coords(item[0], item[2], item[1], current_large)
-        else:
-            x, y, is_big = get_grid_coords(item[1], item[2], item[0], current_large)
-        if is_big:
-            highlight_large_cell(x, y, RED)
-        else:
-            highlight_small_cell(x, y, RED)
-            
+    return x_coord, y_coord, board == current_large    
+    
+    
+    
+def get_selected_coordinates(x, y, current_large):
+    """get coordinates from x perspective of selected box"""
+    (a,b) = coord_lookup[current_large]
+    
+    x = ((x - a) // LARGE_CELL_SIZE)
+    y = ((y - b) // LARGE_CELL_SIZE)
+    
+    return x, y
+
+
+#-------------------------------------------------------------------------------
+# DRAWING THE MENU AND CUBE IMAGE
+#-------------------------------------------------------------------------------
     
 def draw_menu(vertices):
     """ draw menu """
@@ -542,6 +507,70 @@ def draw_z_view_parallelogram(vertices, border_colour=BLACK, fill_colour=WHITE):
     pygame.draw.polygon(DISPLAY, border_colour, (vertices[6], vertices[2], vertices[3], vertices[4]), 5)
     
     
+    
+#-------------------------------------------------------------------------------
+# MANAGE DISPLAY
+#-------------------------------------------------------------------------------
+    
+def update_display(cube, current_large, current_dim, incorrect, vertices, selected=None, mouse_x=None, mouse_y=None):
+    """ redraw display """
+    DISPLAY.fill(WHITE)
+    draw_all_grids(current_large)
+    draw_menu(vertices)
+    
+    if current_dim == "x":
+        cube_ls = cube.x_elements
+        draw_x_view_parallelogram(vertices, fill_colour=YELLOW)
+        
+    elif current_dim == "y":
+        cube_ls = cube.y_elements
+        draw_y_view_parallelogram(vertices, fill_colour=YELLOW)
+    else:
+        cube_ls = cube.z_elements
+        draw_z_view_parallelogram(vertices, fill_colour=YELLOW)
+    populate_all_cells(cube_ls, current_large)
+    
+    
+    if mouse_x is not None and mouse_y is not None:
+        if in_large_box(mouse_x, mouse_y, current_large):
+            highlight_relevant_cells(mouse_x, mouse_y, current_large)
+            draw_large_box(mouse_x, mouse_y, current_large)
+        in_small, coords = in_small_box(mouse_x, mouse_y, current_large)
+        if in_small:
+            draw_small_box(*coords, current_large)
+        elif in_check(mouse_x, mouse_y):
+            draw_check(BLUE)
+        elif in_solve(mouse_x, mouse_y):
+            draw_solve(BLUE)
+        elif in_new_game(mouse_x, mouse_y):
+            #give blue border to new game box
+            draw_new_game(BLUE)
+        elif in_x_face(mouse_x, mouse_y, vertices):
+            #give x face blue border
+            if current_dim == 'x':
+                draw_x_view_parallelogram(vertices, BLUE, YELLOW)
+            else:
+                draw_x_view_parallelogram(vertices, BLUE)
+        elif in_y_face(mouse_x, mouse_y, vertices):
+            if current_dim == 'y':
+                draw_y_view_parallelogram(vertices, BLUE, YELLOW)
+            else:
+                draw_y_view_parallelogram(vertices, BLUE)
+        elif in_z_face(mouse_x, mouse_y, vertices):
+            if current_dim == 'z':
+                draw_z_view_parallelogram(vertices, BLUE, YELLOW)
+            else:
+                draw_z_view_parallelogram(vertices, BLUE)
+            
+    if selected is not None:
+        #give border to current selected box
+        select_box(*selected, current_large)
+        
+    #highlight any incorrect squares red
+    mark_incorrect(current_dim, incorrect, current_large)
+    label_cube(vertices)
+    
+    
 def get_value(key, val=""):
     """ get value of number key typed """
     if key == pygame.K_1:
@@ -568,6 +597,10 @@ def get_value(key, val=""):
         
     return val
     
+    
+#-------------------------------------------------------------------------------
+# RUN GAME
+#-------------------------------------------------------------------------------
     
 def main():
     #start with center board in focus
