@@ -30,7 +30,7 @@ WINDOW_Y = GAME_SECTION
 FPSCLOCK = pygame.time.Clock()
 DISPLAY = pygame.display.set_mode((WINDOW_X, WINDOW_Y))
 
-FPS = 20
+FPS = 30
 
 # colours for text, background and grids
 BLACK = (0, 0, 0)
@@ -658,7 +658,9 @@ def main():
                 
             elif in_solve(mouse_x, mouse_y):
                 #solve game
-                cube = solved_cube
+                #cube = solved_cube
+                #check here to see if any incorrect entries
+                solver = Solver(cube, vertices)
                 
             elif in_check(mouse_x, mouse_y):
                 #get incorrect values
@@ -676,9 +678,6 @@ def main():
         # redraw everything
         get_all_grid_coordinates(current_large)
         update_display(cube, current_large, current_dim, incorrect, vertices, selected, mouse_x, mouse_y)
-        
-        print("GO")
-        solver = Solver(cube, vertices)
     
         pygame.display.update()    
         FPSCLOCK.tick(FPS)        

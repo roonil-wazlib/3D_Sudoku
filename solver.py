@@ -64,7 +64,6 @@ class Solver:
                     current_set.remove(self.cube.x_elements[3*(x//3)+j][3*(y//3)+i][z])
         
         self.solver.insert_value(current_set, y, z, x)
-        print(current_set)
         
         if len(current_set) == 1:
             self.cube.insert_value(list(current_set)[0], y, z, x)
