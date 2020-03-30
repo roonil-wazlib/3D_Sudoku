@@ -593,7 +593,8 @@ def get_value(key, val=""):
         val = 9
     elif key == pygame.K_0:
         val = 0
-    #TODO add delete option
+    elif key == pygame.K_BACKSPACE:
+        val = ""
         
     return val
     
@@ -654,7 +655,7 @@ def main():
                 else:
                     val = get_value(event.key)
                     
-                    if selected is not None and val != "":
+                    if selected is not None:
                         #get coordinates of selected square
                         x, y = get_selected_coordinates(*selected, current_large)
                         z = current_large - 1
@@ -693,6 +694,10 @@ def main():
                 #solve game
                 #cube = solved_cube
                 #check here to see if any incorrect entries
+                incorrect = cube.check(solved_cube)
+                for item in incorrect:
+                    cube.insert_value(solution[item[2]][item[1]][item[0]], item[1], item[0], item[2])
+                incorrect = []
                 solver = Solver(cube, vertices)
                 
             elif in_check(mouse_x, mouse_y):
