@@ -47,7 +47,7 @@ This algorithm is not capable of generating every single 3D Sudoku board - nowhe
 Finally, now that we have a solution, a function removes elements from the cube at random until there are 500 blank gaps to be
 completed by the user (leaving 229 values filled in). This does guarantee the existence of at least one solution, however, it does
 not guarantee the existence of a unique solution. Luckily, the distribution of the blank squares is highly unlikely to result in
-a puzzle that can not be uniquely solved, so this is not of major concern. The problem of how many squares can be removed and from where is similar to that of solving partial latin squares, which is an open problem.
+a puzzle that can not be uniquely solved, so this is not of major concern. The problem of determining whether an arbitrary Latin Square is uniquely completable is an open one, so it seems unlikely that I will be able to improve this method particularly easily.
 
 
 ## How the game works
