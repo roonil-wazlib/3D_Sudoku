@@ -116,6 +116,27 @@ def generate_3d_board():
     return shuffle_cube(cube)
 
 
+def generate_unshuffled_3d_board():
+    """for purposes of bruteforcing the hardest uniquely solvable game"""
+    layer = generate_ordered_2d_board()
+    cube = []
+    for i in range(len(layer)):
+        new_layer = []
+        for column in layer:
+            new_column = []
+            #this nested mess is to ensure that none of the sub 3x3 squares violates sudoku rules from any x y or z perspective
+            #(also the Latin Square rules but the subsquares are trickier and the cause of more mess)
+            for j in range(3):
+                for k in range(3):
+                    #lot of 3 = (i+j) % 3
+                    #index within lot = (i + k + (i//3)) % 3 
+                    new_column.append(column[3*((i + j) % 3) + (i + k + (i // 3)) % 3])
+            new_layer.append(new_column)
+        cube.append(new_layer)
+        
+    return cube
+
+
 def convert_to_game(cube):
     """ convert a valid Sudoku cube to a solvable game """
     game_cube = cube[:]
