@@ -11,11 +11,11 @@ class Solver:
         self.solver = self.setup_sets(copy.deepcopy(cube))
         self.cube = cube
         self.is_incomplete = True
+        self.something_changed = True
         
-        while(self.is_incomplete):
-            self.loop_cube()
-            
-            
+        while self.is_incomplete and self.something_changed:
+            self.something_changed = False
+            self.loop_cube()  
                 
                 
     def setup_sets(self, cube):
@@ -74,6 +74,7 @@ class Solver:
         self.solver.insert_value(current_set, y, z, x)
         
         if len(current_set) == 1:
+            self.something_changed = True
             self.cube.insert_value(list(current_set)[0], y, z, x)
             self.solver.insert_value(list(current_set)[0], y, z, x)
             
