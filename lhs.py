@@ -136,12 +136,14 @@ def build_game(num_blank):
 def main():
     #testing if various games are solvable:
     
-    for i in range(500, 729):
-        game = build_game(i)
-        cube = Sudoku3D(game, False)
-        solver = Solver(cube)
-        if not solver.is_incomplete:
-            print(i)
+    for i in range(625, 729):
+        while True:
+            game = build_game(i)
+            cube = Sudoku3D(game, False)
+            solver = Solver(cube)
+            if not solver.is_incomplete:
+                print(i)
+                break
             
             
 main()
