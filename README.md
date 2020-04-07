@@ -47,7 +47,20 @@ This algorithm is not capable of generating every single 3D Sudoku board - nowhe
 Finally, now that we have a solution, a function removes elements from the cube at random until there are 500 blank gaps to be
 completed by the user (leaving 229 values filled in). This does guarantee the existence of at least one solution, however, it does
 not guarantee the existence of a unique solution. Luckily, the distribution of the blank squares is highly unlikely to result in
-a puzzle that can not be uniquely solved, so this is not of major concern. The problem of determining whether an arbitrary Latin Square is uniquely completable is an open one, so it seems unlikely that I will be able to improve this method particularly easily.
+a puzzle that can not be uniquely solved, so this is not of major concern. The problem of determining whether an arbitrary Latin Square is uniquely completable is an open one, so it is difficult to improve this method particularly easily.
+
+
+## Optimising Cube Difficulty
+
+While finding a solvable cube is not hard and can be done easily just by removing (say) 500 elements at random, this is not the hardest the game can be. We here define difficulty by the number of blank spaces in the generated game, but are still looking for uniquely solvable games. Therefore, games that have so many blank spaces that there is more than one viable solution are not considered. Also define infomation to represent what we know about the number of possibilities there are for values that can fill each of the remaining blank spaces at any given time. Ie, we know more about a space that could contain {1, 7} than one that could contain {1,3,5,6,7,9}. Finally if a filled space shares a row, column or subsquare with another, say they 'threaten' eachother, analagously to the Rook Problem.
+
+In order to address the problem of maximising difficuly, we first make some approximations. For a given integer n representing the number of blank spaces, it may or may not be possible to arrange them such that the cube is uniquely solvable, but even if it is, not every arrangement will be. Checking every arrangement of blank spaces is not an option - there are 729! / n! of them - far too many to compute. Instead, observe that for any non-blank space added to the cube, we gain the most 'infomation' from it if it 'threatens' the fewest possible number of other filled in spaces. Thus we are more likely to find a unique solution by considering game permutations where the filled/blank spaces are as evenly distributed as possible - ie, the average number of elements that each filled space threatens is minimised.
+
+A method already exists for solving similar problems - Latin Hypercube Sampling (LHS). I attempted to modify this algorithm to do a similar job on my 3D Sudoku cube. The immediate issue is that LHS is only defined for working with independent variables. In the case of a cube, that's x, y and z coordinates. However, squares may also threaten eachother within subsquares, as well as when sharing x, y or z values, and subsquare number (however we might define this ordering) is clearly not independent of coordinates. I have not found a satisfactory way around this hitch.
+
+To simplify the issue, the cube is partioned into different sections and 1 space from each is selected each iteration of the algorithm (which iterates until n blank squares remain). The selection is done in a manner similar to LHS. This ensures that within each iteration, we can prevent any 2 selected squares from threatening one another. This does not work between successive iterations. Additionally, because the Sudoku cube is 3-dimensional, it is impossible to partition into subsquares, as these overlap when considering different planes. Instead, the cube is partitioned into the 27 subcubes, another approximationt that reduces the evenness of the result.
+
+As non-ideal as the resulting game is, it is a much more even result than just randomly selecting elements. Using the lhs algorithm and the solver, I have determined that there exist solvable Sudoku cubes for any number of blank spaces <= 628, much better than my bound using a random generator, which sat at around 570.
 
 
 ## How the game works
