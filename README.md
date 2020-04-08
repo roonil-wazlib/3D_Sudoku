@@ -82,9 +82,9 @@ can also generate a new game, or give up and click the solve button.
 ## Solving the puzzle (automatically)
 
 The solve button does not immediately display the solution, although this is stored from the time of puzzle generation. Instead, it
-runs the solver algorithm, and visualises it's progress by highlighting the squares corresponding to the cell currently being looked
+runs the solver algorithm, and visualises its progress by highlighting the squares corresponding to the cell currently being looked
 at by the solver.
 
 The solver works by looping through the 729 cells in the puzzle systematically, at each step calculating the set of all possible values
 that can go in that cell by looking at the corresponding rows, columns and subsquares. When that set has a size of 1, that element is
-inserted into the puzzle. This proceeds until all cells have been filled.
+inserted into the puzzle. This proceeds until all cells have been filled, or a full iteration is completed with no changes which indicates a puzzle with no unique solution.
