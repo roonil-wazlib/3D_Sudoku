@@ -78,7 +78,8 @@ def build_game(num_blank):
     
     #since all boards isomorphic to a uniquely solvable game should also be uniquely solvable (??),
     #we need only check the ordered case
-    sudoku_ls = generate_unshuffled_3d_board()
+    solution = generate_3d_board()
+    
     
     #generate initial coordinate values, and subcube reference
     subcube_indices = get_subcube_indices()
@@ -121,7 +122,7 @@ def build_game(num_blank):
             #remove specific point from overall coordinates. will throw error if I've messed up
             available_coordinates.remove((x, y, z))
             
-            game[x][y][z] = sudoku_ls[x][y][z]
+            game[x][y][z] = solution[x][y][z]
             
             num_selected += 1
             if num_selected >= 729 - num_blank:
@@ -135,8 +136,8 @@ def build_game(num_blank):
 
 def main():
     #testing if various games are solvable:
-    
-    for i in range(625, 729):
+    #(solutions found up to 628 blanks)
+    for i in range(590, 729):
         while True:
             game = build_game(i)
             cube = Sudoku3D(game, False)
@@ -145,5 +146,4 @@ def main():
                 print(i)
                 break
             
-            
-main()
+#main()

@@ -613,23 +613,18 @@ def main():
     pygame.display.set_caption('3D Sudoku')
     get_all_grid_coordinates(current_large)
     vertices = get_cube_vertices()
-
-    #comment this to generate game of specific difficulty
-    solved_cube_ls = generate_3d_board()
-    solution = copy.deepcopy(solved_cube_ls)
-    game_cube = convert_to_game(solved_cube_ls)
     
     
-    #uncomment this to generate game of specific difficulty
-    #while True:
-        #game = build_game(625) #ENTER NUM OF BLANK SPACES HERE - HIGHEST KNOWN POSSIBLE VALUE 628
-        #cube = Sudoku3D(copy.deepcopy(game), False)
-        #solver1 = Solver(cube)
+    while True:
+        game = build_game(590) #ENTER NUM OF BLANK SPACES HERE - HIGHEST KNOWN POSSIBLE VALUE 628.
+        #ANYTHING MUCH HIGHER THAN 590 CAN TAKE SOME TIME TO FIND
+        cube = Sudoku3D(copy.deepcopy(game), False)
+        solver1 = Solver(cube)
         
-        #if not solver1.is_incomplete:
-            #solution = solver1.solver.x_elements
-            #game_cube = copy.deepcopy(game)
-            #break
+        if not solver1.is_incomplete:
+            solution = solver1.solver.x_elements
+            game_cube = copy.deepcopy(game)
+            break
     
     
     solved_cube = Sudoku3D(solution)
