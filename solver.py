@@ -1,6 +1,7 @@
 from sudoku_classes import *
 from generate_sudoku import *
 from create_board import *
+from solver import *
 import copy
 import time
 
