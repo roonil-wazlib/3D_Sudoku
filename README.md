@@ -1,12 +1,37 @@
 # 3D_Sudoku
 A Pygame project to generate and solve Sudoku games in 3 dimensions.
 
+Requires : Python3+, Pygame 1.9.6+.
+
+
+## How to Play
+
+Run create_board.py.
+
+The view consists of 9 numbered Sudoku squares, corresponding to the 9 stacked layers of 
+the board as viewed from the current perspective. This perspective can be changed at any time, either by selecting the face of 
+the cube on the graphic on the right hand side, or by selecting x y or z using the keyboard. The 9 squares will repopulate at
+this time.
+
+When hovering over a cell on the selected board, the cells in the corresponding rows, columns and subsquares will be highlighted
+in each of the 9 boards. These differenct coloured highlights represent the cells that are within the same row/column in any dimension
+(yellow), or in the same 3x3 subsquare (blue, pink, purple). Within each of those colours, no value can be repeated.
+
+To edit a square, select it with your mouse, and use your keyboard to add a value. Backspace deletes the value in that cell. At any
+time the user may check their solution by clicking the check button, and any incorrect values will be highlighted in red. Users
+can also generate a new game, or give up and click the solve button.
+
+To run on a game of specific difficulty, see the commented section in main.py. For inputs of more than around 610 blank squares it can take some time for the game to generate. The program is looking for a solvable game instance.
+
+
+## How it all works
 
 ## Generalising Sudoku to higher dimensions
 
 For the purposes of this game, a 'valid' Sudoku cube is considered to be a 9x9x9 cube of elements such that any 2 dimensional
 'slice' of the cube is a valid 9x9 Sudoku board. That is to say, any row or column from any perspective contains every value
 between 1 and 9 exactly once, and each 3x3 'subsquare' from any perspective has the same property. This has the advantage of being a definition that could be extended to any dimension if you were really bored, but it is slightly counter intuitive in that one might expect the 3x3x3 'subcubes' to behave similarly to the 3x3 'subsquares' in 2 dimensions. Naturally they can not, as we still only have 9 elements, not the 27 here required for uniqueness.
+
 
 ## Generating the cube
 
@@ -63,28 +88,12 @@ To simplify the issue, the cube is partioned into different sections and 1 space
 As non-ideal as the resulting game is, it is a much more even result than just randomly selecting elements. Using the lhs algorithm and the solver, I have determined that there exist solvable Sudoku cubes for any number of blank spaces <= 628, much better than my bound using a random generator, which sat at around 570.
 
 
-## How the game works
-
-The game is implemented using Pygame. The view consists of 9 numbered Sudoku squares, corresponding to the 9 stacked layers of 
-the board as viewed from the current perspective. This perspective can be changed at any time, either by selecting the face of 
-the cube on the graphic on the right hand side, or by selecting x y or z using the keyboard. The 9 squares will repopulate at
-this time.
-
-When hovering over a cell on the selected board, the cells in the corresponding rows, columns and subsquares will be highlighted
-in each of the 9 boards. These differenct coloured highlights represent the cells that are within the same row/column in any dimension
-(yellow), or in the same 3x3 subsquare (blue, pink, purple). Within each of those colours, no value can be repeated.
-
-To edit a square, select it with your mouse, and use your keyboard to add a value. Backspace deletes the value in that cell. At any
-time the user may check their solution by clicking the check button, and any incorrect values will be highlighted in red. Users
-can also generate a new game, or give up and click the solve button.
-
-
 ## Solving the puzzle (automatically)
 
 The solve button does not immediately display the solution, although this is stored from the time of puzzle generation. Instead, it
-runs the solver algorithm, and visualises it's progress by highlighting the squares corresponding to the cell currently being looked
+runs the solver algorithm, and visualises its progress by highlighting the squares corresponding to the cell currently being looked
 at by the solver.
 
 The solver works by looping through the 729 cells in the puzzle systematically, at each step calculating the set of all possible values
 that can go in that cell by looking at the corresponding rows, columns and subsquares. When that set has a size of 1, that element is
-inserted into the puzzle. This proceeds until all cells have been filled.
+inserted into the puzzle. This proceeds until all cells have been filled, or a full iteration is completed with no changes which indicates a puzzle with no unique solution.
