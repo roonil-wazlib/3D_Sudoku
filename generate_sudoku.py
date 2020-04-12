@@ -79,7 +79,7 @@ def rows_to_columns(board):
         
     return output
     
-    
+
 def shuffle_cube(cube):
     """shuffle the columns around within the 3D implementation"""
     shuffled = []
@@ -95,6 +95,7 @@ def shuffle_cube(cube):
     return shuffled    
     
     
+
 def generate_3d_board():
     """generate 3D cube from 2D board"""
     layer = generate_shuffled_2d_board()
@@ -116,8 +117,32 @@ def generate_3d_board():
     return shuffle_cube(cube)
 
 
+#UNSURE OF WHETHER TO DO IT THIS WAY...
+#def generate_3d_board(n):
+    #"""generate a shuffled 3D cube with n blank spaces"""
+    #game, solution = build_game(n) #check here if solvable
+    #shuffled_game, shuffled_solution = shuffle_cube(game, solution)
+    
+    
+#def shuffle_cube(game, solution):
+    #"""Shuffle game and correspondoing solution identicallly"""
+    #shuffled_game = []
+    #shuffled_solution = []
+    #large_order = [0, 1, 2]
+    #random.shuffle(large_order)
+    #for i in large_order:
+        ##shuffle columns within each of the 3 column groups
+        #small_order = [0, 1, 2]
+        #random.shuffle(small_order)
+        #for j in small_order:
+            #shuffled_game.append(game[3*i + j])
+            #shuffled_solution.append(solution[3*i + j])
+                
+    #return shuffled_game, shuffled_solution
+    
+
 def generate_unshuffled_3d_board():
-    """for purposes of bruteforcing the hardest uniquely solvable game"""
+    """get an unshuffled version of the 3d cube"""
     layer = generate_ordered_2d_board()
     cube = []
     for i in range(len(layer)):
@@ -137,20 +162,22 @@ def generate_unshuffled_3d_board():
     return cube
 
 
-def convert_to_game(cube):
-    """ convert a valid Sudoku cube to a solvable game """
-    game_cube = cube[:]
-    count = 0
-    #remove 500 elements from the cube at random
-    while count < 500:
-        x = random.randrange(0,9,1)
-        y = random.randrange(0,9,1)
-        z = random.randrange(0,9,1)
-        if game_cube[x][y][z] != "":
-            count += 1
-            game_cube[x][y][z] = ""
+
+# OLD VERSION
+#def convert_to_game(cube):
+    #""" convert a valid Sudoku cube to a solvable game """
+    #game_cube = cube[:]
+    #count = 0
+    ##remove 500 elements from the cube at random
+    #while count < 500:
+        #x = random.randrange(0,9,1)
+        #y = random.randrange(0,9,1)
+        #z = random.randrange(0,9,1)
+        #if game_cube[x][y][z] != "":
+            #count += 1
+            #game_cube[x][y][z] = ""
         
-    return game_cube
+    #return game_cube
 
 
 
