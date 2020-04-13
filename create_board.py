@@ -598,6 +598,29 @@ def get_value(key, val=""):
         val = ""
         
     return val
+
+
+def generate_game_info():
+    """get game and solution"""
+    
+    #ENTER NUM OF BLANK SPACES HERE - HIGHEST KNOWN POSSIBLE VALUE 628.
+    #ANYTHING TOO MUCH HIGHER THAN 590 CAN TAKE SOME TIME TO FIND     
+    NUM_BLANK = 590
+    while True:
+        game = build_game(NUM_BLANK) 
+        cube = Sudoku3D(copy.deepcopy(game), False)
+        solver1 = Solver(cube)
+
+        if not solver1.is_incomplete:
+            solution = solver1.solver.x_elements
+            game_cube = copy.deepcopy(game)
+            break
+
+
+    solved_cube = Sudoku3D(solution)
+    cube = Sudoku3D(game_cube, False)
+    
+    return cube, solved_cube
     
     
 #-------------------------------------------------------------------------------
@@ -614,21 +637,7 @@ def main():
     get_all_grid_coordinates(current_large)
     vertices = get_cube_vertices()
     
-    
-    while True:
-        game = build_game(590) #ENTER NUM OF BLANK SPACES HERE - HIGHEST KNOWN POSSIBLE VALUE 628.
-        #ANYTHING MUCH HIGHER THAN 590 CAN TAKE SOME TIME TO FIND
-        cube = Sudoku3D(copy.deepcopy(game), False)
-        solver1 = Solver(cube)
-        
-        if not solver1.is_incomplete:
-            solution = solver1.solver.x_elements
-            game_cube = copy.deepcopy(game)
-            break
-    
-    
-    solved_cube = Sudoku3D(solution)
-    cube = Sudoku3D(game_cube, False)
+    cube, solved_cube = generate_game_info()
     
     update_display(cube, current_large, current_dim, incorrect, vertices)
     
@@ -695,19 +704,7 @@ def main():
                 
             elif in_new_game(mouse_x, mouse_y):
                 #generate new game
-                while True:
-                    game = build_game(590) #ENTER NUM OF BLANK SPACES HERE - HIGHEST KNOWN POSSIBLE VALUE 628.
-                    #ANYTHING MUCH HIGHER THAN 590 CAN TAKE SOME TIME TO FIND
-                    cube = Sudoku3D(copy.deepcopy(game), False)
-                    solver1 = Solver(cube)
-
-                    if not solver1.is_incomplete:
-                        solution = solver1.solver.x_elements
-                        game_cube = copy.deepcopy(game)
-                        break
-
-                solved_cube = Sudoku3D(solution)
-                cube = Sudoku3D(game_cube, False)
+                cube, solved_cube = generate_game_info()
                 
                 
             elif in_solve(mouse_x, mouse_y):
