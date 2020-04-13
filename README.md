@@ -21,7 +21,7 @@ To edit a square, select it with your mouse, and use your keyboard to add a valu
 time the user may check their solution by clicking the check button, and any incorrect values will be highlighted in red. Users
 can also generate a new game, or give up and click the solve button.
 
-To adjust the game difficulty, see the appropriate comment in main.py and adjust the value. For inputs of more than around 600 blank squares it can take some time for the game to generate. The program is looking for a solvable game instance. The maximum difficulty for which I know there exists a solvable instance is 628 blank squares.
+To adjust the game difficulty, see the appropriate comment in the generate_game_info() function, and adjust the NUM_BLANK value. For inputs of more than around 600 blank squares it can take some time for the game to generate. The program is looking for a solvable game instance. The maximum difficulty for which I know there exists a solvable instance is 628 blank squares, but this generally takes around half an hour to find on my machine.
 
 
 ## How it all works
