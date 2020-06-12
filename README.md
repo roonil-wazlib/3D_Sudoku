@@ -14,7 +14,7 @@ the cube on the graphic on the right hand side, or by selecting x y or z using t
 this time.
 
 When hovering over a cell on the selected board, the cells in the corresponding rows, columns and subsquares will be highlighted
-in each of the 9 boards. These differenct coloured highlights represent the cells that are within the same row/column in any dimension
+in each of the 9 boards. These different coloured highlights represent the cells that are within the same row/column in any dimension
 (yellow), or in the same 3x3 subsquare (blue, pink, purple). Within each of those colours, no value can be repeated.
 
 To edit a square, select it with your mouse, and use your keyboard to add a value. Backspace deletes the value in that cell. At any
