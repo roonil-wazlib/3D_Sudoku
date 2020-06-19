@@ -3,6 +3,9 @@ A Pygame project to generate and solve Sudoku games in 3 dimensions.
 
 Requires : Python3+, Pygame 1.9.6+.
 
+## Quick Demo
+
+![Output sample](https://github.com/roonil-wazlib/3D_Sudoku/blob/master/demo.gif)
 
 ## How to Play
 
