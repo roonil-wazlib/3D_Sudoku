@@ -137,7 +137,7 @@ def build_game(num_blank):
 def main():
     #testing if various games are solvable:
     #(solutions found up to 628 blanks)
-    for i in range(590, 729):
+    for i in range(628, 729):
         while True:
             game = build_game(i)
             cube = Sudoku3D(game, False)
@@ -146,4 +146,5 @@ def main():
                 print(i)
                 break
             
-#main()
+#in order to run these tests, the import lhs line must be removed from create_board to prevent issues with cyclic import        
+main()
