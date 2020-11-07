@@ -25,7 +25,7 @@ time the user may check their solution by clicking the check button, and any inc
 can also generate a new game, or give up and click the solve button.
 
 To adjust the game difficulty, see the appropriate comment in the generate_game_info() function, and adjust the NUM_BLANK value. For inputs of more than around 
-00 blank squares it can take some time for the game to generate. The program is looking for a solvable game instance. The maximum difficulty for which I know there exists a solvable instance is 634 blank squares, but this generally takes around half an hour to find on my machine.
+590 blank squares it can take some time for the game to generate. The program is looking for a solvable game instance. The maximum difficulty for which I know there exists a solvable instance is 634 blank squares, but this generally takes around half an hour to find on my machine.
 
 
 ## How it all works
